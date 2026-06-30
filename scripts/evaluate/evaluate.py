@@ -479,6 +479,19 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
     with open(os.path.join(output_dir, output_metrics_path), mode='w', encoding='utf-8') as json_file:
         json.dump(filtered_data, json_file, indent=4, ensure_ascii=False)
 
+    # ===== 新增：将 filtered_data 追加到 all.jsonl =====
+    all_jsonl_path = os.path.join(output_dir, 'all.jsonl')
+    with open(all_jsonl_path, mode='a', encoding='utf-8') as jsonl_file:
+        for item in filtered_data:
+            simplified_item = {
+                "id": item.get("id"),
+                "answer": item.get("answer"),
+                "Pred_Answer": item.get("Pred_Answer"),
+                "Output": item.get("Output"),
+            }
+            jsonl_file.write(json.dumps(simplified_item, ensure_ascii=False) + '\n')
+    # ===================================================
+
     with open(os.path.join(output_dir, output_metrics_overall_path), mode='w', encoding='utf-8') as json_file:
         json.dump(overall_metrics, json_file, indent=4, ensure_ascii=False)
 

@@ -721,7 +721,7 @@ async def main_async():
             data_path = f'./data/OpenThoughts/{args.split}.json'
         elif args.dataset_name == 'webthinker':
             data_path = f'./data/WebThinker/{args.split}.json'
-        elif args.dataset_name in ['math500', 'gpqa', 'aime', 'amc', 'gaia', 'hle', 'limo']:
+        elif args.dataset_name in ['math500', 'gpqa', 'aime', 'amc', 'gaia', 'hle', 'limo', 'bamboogle', 'seal0', 'XbenchDS']:
             data_path = f'./data/{args.dataset_name.upper()}/{args.split}.json'
         elif args.dataset_name in ['nq', 'triviaqa', 'hotpotqa', 'musique', 'bamboogle', '2wiki']:
             data_path = f'./data/QA_Datasets/{args.dataset_name}.json'

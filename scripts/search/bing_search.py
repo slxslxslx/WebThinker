@@ -165,6 +165,7 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
         str: Extracted text or context.
     """
     try:
+        print(f'google_search.py里面的 extract_text_from_url()开始爬取url={url},use_jina={use_jina},jina_api_key={jina_api_key},snippet={snippet}')
         if use_jina:
             jina_headers = {
                 'Authorization': f'Bearer {jina_api_key}',
@@ -252,9 +253,11 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                     error_msg = results[0].get("error", "Unknown error") if results else "No results returned"
                     return f"WebParserClient error: {error_msg}"
 
+        print(f"google_search.py里面的 extract_text_from_url()里面 爬虫到 url:{url}  fetch结果：{len(text)}")
         if snippet:
             success, context = extract_snippet_with_context(text, snippet)
             if success:
+                print(f"google_search.py里面的 extract_text_from_url()里面的 fetch全文，【extract_snippet_with_context抽取】后的结果：{context}")
                 return context
             else:
                 return text
@@ -300,7 +303,15 @@ def fetch_page_content(urls, max_workers=32, use_jina=False, jina_api_key=None, 
             url = futures[future]
             try:
                 data = future.result()
-                results[url] = data
+                # results[url] = data
+                # ========== 新增：检查是否抓取失败 ==========
+                if data and not data.startswith("Error"):
+                    print(f"jina爬取成功！！！！！！！！！！！")
+                    results[url] = data
+                else:
+                    failed_urls.append(url)
+                    print(f"[Warning] jina 爬取失败 Failed to fetch {url}: {data}")
+                # ============================================
             except Exception as exc:
                 results[url] = f"Error fetching {url}: {exc}"
             # time.sleep(0.1)  # Simple rate limiting
