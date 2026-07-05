@@ -1,0 +1,7 @@
+cache/
+log/
+nltk_data/
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
