@@ -14,15 +14,16 @@ import string
 from typing import Optional, Tuple
 from nltk.tokenize import sent_tokenize
 from typing import List, Dict, Union
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 import aiohttp
 import asyncio
 import chardet
 import random
+from aiohttp_socks import SocksConnector
 
 
 # ----------------------- Set your WebParserClient URL -----------------------
-WebParserClient_url = None
+WebParserClient_url = None  # 当常规爬虫方式（requests + BeautifulSoup 或 Jina AI）失败或遇到限制时，作为降级方案（fallback）调用远程解析服务。
 
 
 # ----------------------- Custom Headers -----------------------
@@ -40,6 +41,7 @@ headers = {
 # Initialize session
 session = requests.Session()
 session.headers.update(headers)
+proxies = {"http": "socks5h://127.0.0.1:1824", "https": "socks5h://127.0.0.1:1824"}
 
 error_indicators = [
     'limit exceeded',
@@ -82,7 +84,7 @@ class WebParserClient:
             requests.exceptions.Timeout: 当请求超时时
         """
         endpoint = urljoin(self.base_url, "/parse_urls")
-        response = requests.post(endpoint, json={"urls": urls}, timeout=timeout)
+        response = requests.post(endpoint, json={"urls": urls}, timeout=timeout, proxies=proxies)
         response.raise_for_status()  # 如果响应状态码不是200，抛出异常
         
         return response.json()["results"]
@@ -97,11 +99,12 @@ def f1_score(true_set: set, pred_set: set) -> float:
     intersection = len(true_set.intersection(pred_set))
     if not intersection:
         return 0.0
-    precision = intersection / float(len(pred_set))
-    recall = intersection / float(len(true_set))
-    return 2 * (precision * recall) / (precision + recall)
+    precision = intersection / float(len(pred_set))  # Precision = |snippet_words ∩ sentence_words| / |sentence_words|
+    recall = intersection / float(len(true_set))  # Recall    = |snippet_words ∩ sentence_words| / |snippet_words|
+    return 2 * (precision * recall) / (precision + recall)  # F1 = 2 * P * R / (P + R)
 
 def extract_snippet_with_context(full_text: str, snippet: str, context_chars: int = 3000) -> Tuple[bool, str]:
+    # 在网页全文中找到这段摘要对应的原始句子，并截取该句子前后一定长度的上下文返回。
     """
     Extract the sentence that best matches the snippet and its context from the full text.
 
@@ -113,10 +116,13 @@ def extract_snippet_with_context(full_text: str, snippet: str, context_chars: in
     Returns:
         Tuple[bool, str]: The first element indicates whether extraction was successful, the second element is the extracted context.
     """
+    print(f"google_search.py里面的 extract_snippet_with_context() 传入的len(full_text)={len(full_text)}")
+    print(f"google_search.py里面的 extract_snippet_with_context() 传入的snippet={snippet}")
+    print(f"google_search.py里面的 extract_snippet_with_context() 传入的context_chars={context_chars}")
     try:
-        full_text = full_text[:100000]
+        full_text = full_text[:100000]  # 全文截断到 100,000 字符（防止过长处理）
 
-        snippet = snippet.lower()
+        snippet = snippet.lower() # 转小写、去除标点 → 分词得到 snippet_words（集合）
         snippet = remove_punctuation(snippet)
         snippet_words = set(snippet.split())
 
@@ -124,34 +130,37 @@ def extract_snippet_with_context(full_text: str, snippet: str, context_chars: in
         best_f1 = 0.2
 
         # sentences = re.split(r'(?<=[.!?]) +', full_text)  # Split sentences using regex, supporting ., !, ? endings
-        sentences = sent_tokenize(full_text)  # Split sentences using nltk's sent_tokenize
+        #  全文分句（使用 nltk.sent_tokenize）
+        sentences = sent_tokenize(full_text)  # Split sentences using nltk's sent_tokenize  
 
-        for sentence in sentences:
-            key_sentence = sentence.lower()
+        for sentence in sentences:  # 遍历每句话，计算 F1 Score
+            key_sentence = sentence.lower()  # 句子同样：小写 → 去标点 → 分词
             key_sentence = remove_punctuation(key_sentence)
             sentence_words = set(key_sentence.split())
-            f1 = f1_score(snippet_words, sentence_words)
-            if f1 > best_f1:
+            f1 = f1_score(snippet_words, sentence_words)  
+            if f1 > best_f1: # 保留 F1 > 0.2 且分数最高的句子（best_sentence）
                 best_f1 = f1
                 best_sentence = sentence
-
-        if best_sentence:
+        # 是否找到 best_sentence?
+        if best_sentence: # 是 → 定位句子在全文中的位置
             para_start = full_text.find(best_sentence)
             para_end = para_start + len(best_sentence)
             start_index = max(0, para_start - context_chars)
             end_index = min(len(full_text), para_end + context_chars)
             # if end_index - start_index < 2 * context_chars:
             #     end_index = min(len(full_text), start_index + 2 * context_chars)
-            context = full_text[start_index:end_index]
-            return True, context
+            context = full_text[start_index:end_index]  # 截取 [pos - context_chars, pos + len(sentence) + context_chars]
+            print(f"google_search.py里面的 extract_snippet_with_context() 找到匹配snippet的句子！！！成功返回best_sentence：{best_sentence}\n返回的content：{context}")
+            return True, context  # 返回 (True, context)
         else:
             # If no matching sentence is found, return the first context_chars*2 characters of the full text
-            return False, full_text[:context_chars * 2]
+            print(f"❌❌❌google_search.py里面的 extract_snippet_with_context() 找不到匹配snippet的句子，失败了！！！！！！！,退化为前 N 字符")
+            return False, full_text[:context_chars * 2]  # 返回 (False, full_text[:context_chars*2])  # 退化为前 N 字符
     except Exception as e:
         return False, f"Failed to extract snippet context due to {str(e)}"
 
 def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optional[str] = None, keep_links=False):
-    """
+    """  当 use_jina=False 时，它使用传统的 requests + BeautifulSoup 方案获取网页内容，并内置了多级降级策略（错误检测 → WebParserClient 备用 → 纯文本提取）。
     Extract text from a URL. If a snippet is provided, extract the context related to it.
 
     Args:
@@ -171,44 +180,47 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                 'Authorization': f'Bearer {jina_api_key}',
                 'X-Return-Format': 'markdown',
             }
-            response = requests.get(f'https://r.jina.ai/{url}', headers=jina_headers).text
-            # Remove URLs
+            response = requests.get(f'https://r.jina.ai/{url}', headers=jina_headers, proxies=proxies,).text
+            # Remove URLs  。Jina 走 r.jina.ai 拿 markdown 并用正则去掉其中的 URL
+            response.raise_for_status()  # 4xx/5xx 会抛异常
             pattern = r"\(https?:.*?\)|\[https?:.*?\]"
             text = re.sub(pattern, "", response).replace('---','-').replace('===','=').replace('   ',' ').replace('   ',' ')
-        else:
-            if 'pdf' in url:
+            print(f"google_search.py里面的 extract_text_from_url()里面的 jina爬取 text={text} ")
+        else:  # （use_jina=False 分支）
+            if 'pdf' in url:  # 如果 URL 包含 "pdf"，则调用 extract_pdf_text 函数处理 PDF 文件。
                 return extract_pdf_text(url)
 
-            try:
-                response = session.get(url, timeout=30)
+            try:  # 发送 HTTP 请求
+                response = session.get(url, timeout=30, proxies=proxies)
                 response.raise_for_status()
                 
                 # 添加编码检测和处理
-                if response.encoding.lower() == 'iso-8859-1':
+                if response.encoding.lower() == 'iso-8859-1':  # 如果响应编码是 iso-8859-1，则尝试从内容中检测正确的编码。
                     # 尝试从内容检测正确的编码
                     response.encoding = response.apparent_encoding
                 
-                try:
+                try:  # 先用 lxml 解析器，失败则回退到 html.parser。
                     soup = BeautifulSoup(response.text, 'lxml')
                 except Exception:
                     soup = BeautifulSoup(response.text, 'html.parser')
 
-                # Check if content has error indicators
+                # Check if content has error indicators 。检查页面是否包含错误指示（如 "limit exceeded"、"Please turn on Javascript" 等），且内容少于64个词，或内容为空。
                 has_error = (any(indicator.lower() in response.text.lower() for indicator in error_indicators) and len(response.text.split()) < 64) or response.text == ''
-                if has_error:
-                    if WebParserClient_url is None:
+                if has_error:  # 检测到错误
+                    print(f"extract_text_from_url 爬虫 检测到错误，降级到WebParserClient")
+                    if WebParserClient_url is None:  # WebParserClient_url 是否已设置?  否 → 直接返回错误字符串
                         # If WebParserClient is not available, return error message
                         return f"Error extracting content: {str(e)}"
                     # If content has error, use WebParserClient as fallback
-                    client = WebParserClient(WebParserClient_url)
+                    client = WebParserClient(WebParserClient_url)  # 是 → 调用远程解析服务 (POST /parse_urls)
                     results = client.parse_urls([url])
                     if results and results[0]["success"]:
                         text = results[0]["content"]
                     else:
                         error_msg = results[0].get("error", "Unknown error") if results else "No results returned"
                         return f"WebParserClient error: {error_msg}"
-                else:
-                    if keep_links:
+                else:  # 内容提取（两种模式）
+                    if keep_links:  # 遍历所有元素，保留文本和链接的 Markdown 格式 [text](url)：
                         # Clean and extract main content
                         # Remove script, style tags etc
                         for element in soup.find_all(['script', 'style', 'meta', 'link']):
@@ -238,7 +250,7 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                         text = ' '.join(text_parts)
                         # Clean extra spaces
                         text = ' '.join(text.split())
-                    else:
+                    else:  # soup.get_text() 提取纯文本（默认）
                         text = soup.get_text(separator=' ', strip=True)
             except Exception as e:
                 if WebParserClient_url is None:
@@ -254,16 +266,17 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                     return f"WebParserClient error: {error_msg}"
 
         print(f"google_search.py里面的 extract_text_from_url()里面 爬虫到 url:{url}  fetch结果：{len(text)}")
-        if snippet:
+        if snippet: # 是否提供了 snippet?
             success, context = extract_snippet_with_context(text, snippet)
-            if success:
+            print(f"bing_search.py里面的 extract_text_from_url 循环 里面的 extract_snippet_with_context结果：success={success}，context={json.dumps(context, indent=4, ensure_ascii=False)}")
+            if success: # 成功 → 返回定位后的上下文
                 print(f"google_search.py里面的 extract_text_from_url()里面的 fetch全文，【extract_snippet_with_context抽取】后的结果：{context}")
-                return context
-            else:
+                return context  # 失败 → 返回完整文本
+            else: # 没提供snippet  返回 text[:20000]（前 2 万字符）
                 return text
         else:
             # If no snippet is provided, return directly
-            return text[:20000]
+            return text[:20000]  # 如果没有 snippet，返回前 20000 字符
     except requests.exceptions.HTTPError as http_err:
         return f"HTTP error occurred: {http_err}"
     except requests.exceptions.ConnectionError:
@@ -305,11 +318,14 @@ def fetch_page_content(urls, max_workers=32, use_jina=False, jina_api_key=None, 
                 data = future.result()
                 # results[url] = data
                 # ========== 新增：检查是否抓取失败 ==========
-                if data and not data.startswith("Error"):
-                    print(f"jina爬取成功！！！！！！！！！！！")
+                print(f"jina爬取结果：data={data}")
+                if data.code == 402:
+                    print(f"[Warning] jina 爬取失败 Failed to fetch {url}: {data}")
+                elif data and not data.startswith("Error"):
+                    print(f"jina爬取成功！！！！！！！！！！！,data={data}")
                     results[url] = data
                 else:
-                    failed_urls.append(url)
+                    # failed_urls.append(url)
                     print(f"[Warning] jina 爬取失败 Failed to fetch {url}: {data}")
                 # ============================================
             except Exception as exc:
@@ -317,7 +333,7 @@ def fetch_page_content(urls, max_workers=32, use_jina=False, jina_api_key=None, 
             # time.sleep(0.1)  # Simple rate limiting
     return results
 
-def bing_web_search(query, subscription_key, endpoint, market='en-US', language='en', timeout=20):
+def bing_web_search(query, subscription_key, endpoint, market='en-US', language='en', timeout=20, proxies=proxies):
     """
     Perform a search using the Bing Web Search API with a set timeout.
 
@@ -350,7 +366,7 @@ def bing_web_search(query, subscription_key, endpoint, market='en-US', language=
 
     while retry_count < max_retries:
         try:
-            response = requests.get(endpoint, headers=headers, params=params, timeout=timeout)
+            response = requests.get(endpoint, headers=headers, params=params, timeout=timeout, proxies=proxies)
             response.raise_for_status()  # Raise exception if the request failed
             search_results = response.json()
             return search_results
@@ -381,8 +397,9 @@ def extract_pdf_text(url):
     Returns:
         str: Extracted text content or error message.
     """
+    print(f"开始执行 extract_pdf_text")
     try:
-        response = session.get(url, timeout=20)  # Set timeout to 20 seconds
+        response = session.get(url, timeout=20, proxies=proxies)  # Set timeout to 20 seconds
         if response.status_code != 200:
             return f"Error: Unable to retrieve the PDF (status code {response.status_code})"
         
@@ -396,12 +413,14 @@ def extract_pdf_text(url):
         
         # Limit the text length
         cleaned_text = full_text
+        print(f"extract_pdf_text成功，返回内容：cleaned_text={cleaned_text}")
         return cleaned_text
     except requests.exceptions.Timeout:
         return "Error: Request timed out after 20 seconds"
     except Exception as e:
         return f"Error: {str(e)}"
 
+# 将 Bing Web Search API 返回的原始 JSON 响应，解析成结构化的文档列表，供后续流程使用。
 def extract_relevant_info(search_results):
     """
     Extract relevant information from Bing search results.
@@ -413,9 +432,9 @@ def extract_relevant_info(search_results):
         list: A list of dictionaries containing the extracted information.
     """
     useful_info = []
-    
-    if 'webPages' in search_results and 'value' in search_results['webPages']:
-        for id, result in enumerate(search_results['webPages']['value']):
+    print(f'开始执行 bing _search.py里面的 extract_relevant_info ')
+    if 'webPages' in search_results and 'value' in search_results['webPages']:  # 检查 'webPages' 键是否存在
+        for id, result in enumerate(search_results['webPages']['value']):  # 遍历 search_results['webPages']['value'] 中的每个 result
             info = {
                 'id': id + 1,  # Increment id for easier subsequent operations
                 'title': result.get('name', ''),
@@ -427,13 +446,13 @@ def extract_relevant_info(search_results):
                 'context': ''  # Reserved field to be filled later
             }
             useful_info.append(info)
-    
+    print(f'extract_relevant_info执行完毕得到的 useful_info={json.dumps(useful_info, indent=4, ensure_ascii=False)}')
     return useful_info
 
 
 
 
-async def bing_web_search_async(query, subscription_key, endpoint, market='en-US', language='en', timeout=20):
+async def bing_web_search_async(query, subscription_key, endpoint, market='en-US', language='en', timeout=20, proxies=proxies):
     """
     Perform an asynchronous search using the Bing Web Search API.
 
@@ -464,7 +483,7 @@ async def bing_web_search_async(query, subscription_key, endpoint, market='en-US
 
     while retry_count < max_retries:
         try:
-            response = session.get(endpoint, headers=headers, params=params, timeout=timeout)
+            response = session.get(endpoint, headers=headers, params=params, timeout=timeout, proxies=proxies)
             response.raise_for_status()
             search_results = response.json()
             return search_results
@@ -517,6 +536,8 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
                                     jina_api_key: Optional[str] = None, snippet: Optional[str] = None, 
                                     keep_links: bool = False) -> str:
     """Async version of extract_text_from_url"""
+    print(f'开始执行 async def extract_text_from_url_async')
+    print(f'bing_search.py里面的 async def extract_text_from_url_async()开始爬取url={url},use_jina={use_jina},jina_api_key={jina_api_key},snippet={snippet}')
     try:
         if use_jina:
             # 在调用jina之前获取令牌
@@ -532,10 +553,12 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
                     pattern = r"\(https?:.*?\)|\[https?:.*?\]"
                     text = re.sub(pattern, "", text)
                 text = text.replace('---','-').replace('===','=').replace('   ',' ').replace('   ',' ')
+                print(f"google_search.py里面的 extract_text_from_url()里面的 jina爬取 text={text} ")
         else:
             if 'pdf' in url:
                 # Use async PDF handling
                 text = await extract_pdf_text_async(url, session)
+                print(f"是pdf，进入extract_pdf_text_async函数处理,返回 text[:10000]={text[:10000]}")
                 return text[:10000]
 
             async with session.get(url) as response:
@@ -556,6 +579,7 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
                 has_error = (any(indicator.lower() in html.lower() for indicator in error_indicators) and len(html.split()) < 64) or len(html) < 50 or len(html.split()) < 20
                 # has_error = len(html.split()) < 64
                 if has_error:
+                    print(f"extract_text_from_url 爬虫 检测到错误，降级到WebParserClient")
                     if WebParserClient_url is None:
                         # If WebParserClient is not available, return error message
                         return f"Error extracting content: {str(e)}"
@@ -597,12 +621,14 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
 
                         text = ' '.join(text_parts)
                         text = ' '.join(text.split())
-                    else:
+                    else:  # 直接使用 BeautifulSoup 的 get_text() 方法提取纯文本，用空格分隔，去除首尾空白。
                         text = soup.get_text(separator=' ', strip=True)
 
         # print('---\n', text[:1000])
-        if snippet:
+        print(f"google_search.py里面的 extract_text_from_url()里面 爬虫到 url:{url}  fetch结果：{len(text)}")
+        if snippet:  # 调用 extract_snippet_with_context 函数，在全文找到与 snippet 最匹配的句子及其上下文（前后各 3000 字符）。
             success, context = extract_snippet_with_context(text, snippet)
+            print(f"google_search.py里面的 async def extract_text_from_url_async()里面的 fetch全文，【extract_snippet_with_context抽取】后的结果：success={success}，filtered_context={json.dumps(context, indent=4, ensure_ascii=False)}")
             return context if success else text
         else:
             return text[:50000]
@@ -610,12 +636,15 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
     except Exception as e:
         return f"Error fetching {url}: {str(e)}"
 
+# 并发批量爬取多个 URL
 async def fetch_page_content_async(urls: List[str], use_jina: bool = False, jina_api_key: Optional[str] = None, 
                                  snippets: Optional[Dict[str, str]] = None, show_progress: bool = False,
                                  keep_links: bool = False, max_concurrent: int = 32) -> Dict[str, str]:
     """Asynchronously fetch content from multiple URLs."""
+    print(f"开始执行 fetch_page_content_async")
     async def process_urls():
-        connector = aiohttp.TCPConnector(limit=max_concurrent)
+        # connector = aiohttp.TCPConnector(limit=max_concurrent)
+        connector = SocksConnector.from_url('socks5://127.0.0.1:1824', limit=max_concurrent)  # ← 改成 SocksConnector
         timeout = aiohttp.ClientTimeout(total=240)
         async with aiohttp.ClientSession(connector=connector, timeout=timeout, headers=headers) as session:
             tasks = []
@@ -638,7 +667,28 @@ async def fetch_page_content_async(urls: List[str], use_jina: bool = False, jina
             else:
                 results = await asyncio.gather(*tasks)
             
-            return {url: result for url, result in zip(urls, results)}  # 返回字典而不是协程对象
+            # return {url: result for url, result in zip(urls, results)}  # 返回字典而不是协程对象
+            # ========== 新增：判断每个 URL 的爬取状态并输出日志 ==========
+            results_dict = {}
+            success_count = 0
+            fail_count = 0
+            
+            for url, result in zip(urls, results):
+                # 判断成功/失败的标准（与同步版 fetch_page_content 保持一致）
+                print(f"jina爬取结果：result={result}")
+                if getattr(result, 'code', None) == 402:
+                    print(f"[Warning] jina 爬取失败 Failed to fetch {url}: {result}")
+                if result and not result.startswith("Error"):
+                    print(f"[✅ jina爬取成功！！！！！！！！！！！ ] {url} | 内容长度: {len(result)} 字符")
+                    success_count += 1
+                else:
+                    print(f"[❌ [Warning] jina 爬取失败 Failed to fetch] {url} | 原因: {result[:200] if result else '空内容'}")
+                    fail_count += 1
+                results_dict[url] = result
+            
+            print(f"爬取完毕: 成功 {success_count} / 失败 {fail_count} / 总计 {len(urls)}")
+            # ============================================================
+            return results_dict# ← 必须 return，否则外部拿到 None
 
     return await process_urls()  # 确保等待异步操作完成
 
@@ -653,8 +703,9 @@ async def extract_pdf_text_async(url: str, session: aiohttp.ClientSession) -> st
     Returns:
         str: Extracted text content or error message.
     """
+    print(f"开始执行 extract_pdf_text_async")
     try:
-        async with session.get(url, timeout=30) as response:  # Set timeout to 20 seconds
+        async with session.get(url, timeout=30, proxies=proxies) as response:  # Set timeout to 20 seconds
             if response.status != 200:
                 return f"Error: Unable to retrieve the PDF (status code {response.status})"
             
@@ -688,6 +739,7 @@ def google_serper_search(query: str, api_key: str, timeout: int = 20):
     Returns:
         dict: JSON response of the search results. Returns empty dict if request fails.
     """
+    print(f"开始执行 google_serper_search")
     url = "https://google.serper.dev/search"
     payload = json.dumps({"q": query})
     headers = {
@@ -700,9 +752,10 @@ def google_serper_search(query: str, api_key: str, timeout: int = 20):
 
     while retry_count < max_retries:
         try:
-            response = requests.post(url, headers=headers, data=payload, timeout=timeout)
+            response = requests.post(url, headers=headers, data=payload, timeout=timeout, proxies=proxies)
             response.raise_for_status()  # Raise exception if the request failed
             search_results = response.json()
+            print(f"google_search.py里面的 google_web_search() 调用API结果 serper_data：{json.dumps(search_results, indent=4, ensure_ascii=False)}")
             return search_results
         except Timeout:
             retry_count += 1
@@ -731,12 +784,14 @@ def extract_relevant_info_serper(search_results):
         list: A list of dictionaries containing the extracted information.
     """
     useful_info = []
+    print(f'开始 extract_relevant_info_serper')
     if 'organic' in search_results:
         for i, result in enumerate(search_results['organic']):
             # Try to extract domain for site_name, or leave empty
             site_name = ''
             try:
                 site_name = urlparse(result.get('link', '')).netloc
+                print(f"extract_relevant_info_serper link-{result.get('link', '')} 解析出来的 site_name={site_name}")
             except Exception:
                 pass
 
@@ -750,6 +805,7 @@ def extract_relevant_info_serper(search_results):
                 'context': ''  # Reserved field
             }
             useful_info.append(info)
+    print(f"extract_relevant_info_serper 返回的useful_info: {json.dumps(useful_info, indent=4, ensure_ascii=False)}")
     return useful_info
 
 async def google_serper_search_async(query: str, api_key: str, timeout: int = 20):
@@ -764,6 +820,7 @@ async def google_serper_search_async(query: str, api_key: str, timeout: int = 20
     Returns:
         dict: JSON response of the search results. Returns empty dict if all retries fail.
     """
+    print(f"开始进行 async def google_serper_search_async")
     url = "https://google.serper.dev/search"
     payload = json.dumps({"q": query})
     headers_serper = {  # Use a different name to avoid conflict with global headers
@@ -777,12 +834,15 @@ async def google_serper_search_async(query: str, api_key: str, timeout: int = 20
     # Create a timeout object for aiohttp
     client_timeout = aiohttp.ClientTimeout(total=timeout)
 
-    async with aiohttp.ClientSession() as session:
+    # async with aiohttp.ClientSession() as session:
+    connector = SocksConnector.from_url('socks5://127.0.0.1:1824')
+    async with aiohttp.ClientSession(connector=connector) as session:
         while retry_count < max_retries:
             try:
                 async with session.post(url, headers=headers_serper, data=payload, timeout=client_timeout) as response:
                     response.raise_for_status()  # Raise AIOHTTPError for bad status (4xx or 5xx)
                     search_results = await response.json()
+                    print(f"async def google_serper_search_async 的搜索结果 {json.dumps(search_results, indent=4, ensure_ascii=False)}")
                     return search_results
             except asyncio.TimeoutError:
                 retry_count += 1
@@ -830,7 +890,7 @@ if __name__ == "__main__":
 
     elif search_type == "serper":
         # Set your API key for Google Serper API
-        SERPER_API_KEY = "YOUR_GOOGLE_SEARCH_API_KEY"
+        SERPER_API_KEY = "。。。"
 
         print("Performing Google Serper Search...")
         search_results = google_serper_search(query, SERPER_API_KEY)
@@ -851,6 +911,7 @@ if __name__ == "__main__":
         full_text = extract_text_from_url(info['url'], use_jina=False)  # Get full webpage text
         if full_text and not full_text.startswith("Error"):
             success, context = extract_snippet_with_context(full_text, info['snippet'])
+            print(f"run_search_o1.py里面的 relevant_info循环 里面的 extract_snippet_with_context结果：success={success}，context={json.dumps(context, indent=4, ensure_ascii=False)}")
             if success:
                 info['context'] = context
             else:

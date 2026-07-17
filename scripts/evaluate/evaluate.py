@@ -15,9 +15,13 @@ import asyncio
 from typing import List
 
 
+# 从原始输出中"抽提"答案
 def extract_answer_fn(output, mode='qa', extract_answer=False):
-    if extract_answer == False and mode not in ['infogen', 'summary', 'research']:
-        if mode == 'qa':
+    print(f"开始执行 extract_answer_fn，参数：output={output}")
+    print(f"开始执行 extract_answer_fn，参数：mode={mode}")
+    print(f"开始执行 extract_answer_fn，参数：extract_answer={extract_answer}")
+    if extract_answer == False and mode not in ['infogen', 'summary', 'research']:  # qa 模式且 extract_answer=False 时的特殊处理
+        if mode == 'qa':  # # 直接返回完整输出
             return output.strip()
         pred_answer_lines = output.replace("\n\n", "\n").strip().split('\n')
         pred_answer = '\n'.join(pred_answer_lines[-3:])
@@ -28,7 +32,7 @@ def extract_answer_fn(output, mode='qa', extract_answer=False):
         matches = re.findall(pattern, output, re.DOTALL | re.IGNORECASE)
         if matches:
             extracted_text = matches[-1].strip()  # Take the last match
-    elif mode in ['infogen', 'summary', 'research']:
+    elif mode in ['infogen', 'summary', 'research']:  # （信息生成/摘要/研究）
         pattern_info = "**Final Information"
         if "</think>\n" in output:
             extracted_text = output.split("</think>\n")[-1].split("<|begin_click_link|>")[0].replace(pattern_info, "").strip(':**').strip('\n').strip("```").strip()  # 提取</think>后面的内容
@@ -45,24 +49,37 @@ def extract_answer_fn(output, mode='qa', extract_answer=False):
             extracted_text = extracted_text[:6000]
         else:
             extracted_text = extracted_text[:2500]
-    elif mode in ['math', 'choose', 'qa']:
-        pattern = r'\\boxed\{(.*)\}'
+    elif mode in ['math', 'choose', 'qa']:  # （数学/选择/问答）
+        extracted_text = ''
+        pattern = r'\\boxed\{(.*)\}'  # # 优先匹配 \boxed{...}
         matches = re.findall(pattern, output)
+        print(f"extract_answer_fn 里面的 matches={matches}")
         if matches:
+            print(f"extract_answer_fn 里面的 matches={matches} 进入 if matches")
             extracted_text = matches[-1]  # Take the last match
+        # else:  # # 其次匹配 ANSWER: 后面的内容
+        #     pattern = 'ANSWER:'
+        #     if pattern in output:
+        #         print(f"extract_answer_fn 里面的 matches={matches} 进入 if pattern = ANSWER:  if pattern in output")
+        #         extracted_text = output.split(pattern)[-1].strip('**').strip()
         else:
-            pattern = 'ANSWER:'
-            if pattern in output:
-                extracted_text = output.split(pattern)[-1].strip('**').strip()
-        if mode in ['choose']:
+            # 增加 "Final Answer:" 匹配
+            for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:']:
+                if ans_pattern in output:
+                    extracted_text = output.split(ans_pattern)[-1].strip('**').strip().strip('.')
+                    break
+        if mode in ['choose']:  # # choose 模式额外处理 \text{} 和括号
             inner_pattern = r'\\text\{(.*)\}'
             inner_matches = re.findall(inner_pattern, extracted_text)
             if inner_matches:
                 extracted_text = inner_matches[-1]  # Take the last match
             extracted_text = extracted_text.strip("()")
+    print(f"extract_answer_fn 处理后结果，extracted_text={extracted_text}")
     return extracted_text
 
 
+# 用 LLM 判断答案是否等价
+# 当 use_llm=True 时，系统会调用另一个 LLM（如 Qwen2.5-72B）来判断预测答案与标准答案是否语义等价。
 async def llm_evaluate_equivalence_single(
     client: AsyncOpenAI,
     question: str,
@@ -74,8 +91,9 @@ async def llm_evaluate_equivalence_single(
     extract_answer: bool = False,
 ) -> bool:
     """Evaluate a single pair of answers using LLM"""
+    print(f"开始执行llm_evaluate_equivalence_single ")
 
-    if extract_answer:
+    if extract_answer:  # 评估 Prompt
         prompt = f"""You are an evaluation assistant. Please determine if the predicted answer is equivalent to the labeled answer.
 
 Question: {question}
@@ -106,11 +124,24 @@ Did the model give an answer equivalent to the labeled answer? Please respond wi
                     messages=[{"role": "user", "content": prompt}],
                 )
                 response_text = chat_response.choices[0].message.content.strip()
-                llm_judge = is_equiv(pred_answer, labeled_answer) or \
-                    response_text.lower() == "correct" and \
-                    not ("incorrect" in response_text.lower() or \
-                         "wrong" in response_text.lower() or \
-                         "not correct" in response_text.lower())
+                print(f"llm_evaluate_equivalence_single里面的 response_text={response_text}")
+                print(f"llm_evaluate_equivalence_single里面的 pred_answer={pred_answer}")
+                print(f"llm_evaluate_equivalence_single里面的 labeled_answer={labeled_answer}")
+                print(f"llm_evaluate_equivalence_single里面的 is_equiv(pred_answer, labeled_answer)={is_equiv(pred_answer, labeled_answer)}")
+                # 数学等价 或 LLM 明确说 Correct 且没有否定词。
+                # llm_judge = is_equiv(pred_answer, labeled_answer) or \  # 太严格了
+                #     response_text.lower() == "correct" and \
+                #     not ("incorrect" in response_text.lower() or \
+                #          "wrong" in response_text.lower() or \
+                #          "not correct" in response_text.lower())
+                resp_low = response_text.lower()
+                print(f"llm_evaluate_equivalence_single里面的 resp_low={resp_low}")
+                llm_judge = is_equiv(pred_answer, labeled_answer) or (
+                    "correct" in resp_low and
+                    not ("incorrect" in resp_low or "wrong" in resp_low or "not correct" in resp_low)
+                )
+                print(f" llm_evaluate_equivalence_single 的  response_text={response_text}")
+                print(f" llm_evaluate_equivalence_single 的  llm_judge={llm_judge}")
                 return llm_judge, response_text
         except Exception as e:
             if attempt == retry_limit - 1:
@@ -137,7 +168,8 @@ async def llm_evaluate_equivalence_batch(
     if api_base_url is None:
         api_base_url = None
     if model_name is None:
-        model_name = "Qwen2.5-72B-Instruct"
+        # model_name = "Qwen2.5-72B-Instruct"
+        model_name = "qwen3.5-9b"
 
     client = AsyncOpenAI(
         api_key=api_key,
@@ -171,18 +203,21 @@ async def llm_evaluate_equivalence_batch(
     return results
 
 
+# 计算 EM/Acc/F1/Math 等指标
 def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, question=None, extract_answer=False):
-    final_metric = {"is_valid_answer": False, "acc": 0, "em": 0, "f1": 0, 'math_equal': 0, 'llm_equal': 0}
-    pred_answer = extract_answer_fn(output, mode=mode, extract_answer=extract_answer)
+    final_metric = {"is_valid_answer": False, "acc": 0, "em": 0, "f1": 0, 'math_equal': 0, 'llm_equal': 0} # 2. 初始化指标字典
+    pred_answer = extract_answer_fn(output, mode=mode, extract_answer=extract_answer)  # 调用 extract_answer_fn() 提取 Pred_Answer
     pred_answer_new = pred_answer
-    if pred_answer != '':
+    if pred_answer != '':  # 判断答案是否有效
+        print(f"evaluate.py里面 extract_answer_fn 得到的 pred_answer有效={pred_answer} ")
         final_metric["is_valid_answer"] = True
-    else:
+    else: # 输出最后 5 行
+        print(f"❌❌❌evaluate.py里面 extract_answer_fn 得到的 pred_answer 无效={pred_answer} ")
         # If no answer was extracted, keep only the last 3 lines
         pred_answer_new = '\n'.join(output.replace("\n\n", "\n").strip().split('\n')[-5:])
 
     if mode in ['qa']:
-        def normalize_answer_qa(s):
+        def normalize_answer_qa(s):  #  # 去冠词(a/an/the) → 去标点 → 转小写 → 合并空格
             def remove_articles(text):
                 return re.sub(r"\b(a|an|the)\b", " ", text)
             def white_space_fix(text):
@@ -213,7 +248,7 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
                 final_metric[k] = max(eval(k), final_metric[k])
 
     elif mode in ['math', 'choose']:
-        def normalize_answer(text):
+        def normalize_answer(text):  # # 仅小写+合并空格
             text = text.lower()
             text = " ".join(text.strip().split())
             return text
@@ -250,8 +285,16 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
     return final_metric, pred_answer
 
 
-def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir, output_metrics_path, output_metrics_overall_path, use_llm=False, extract_answer=False, domain_fields=None, api_base_url=None, model_name=None):
+# 主流程：遍历数据、调用上述函数
+# def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir, output_metrics_path, output_metrics_overall_path, use_llm=False, extract_answer=False, domain_fields=None, api_base_url=None, model_name=None):
+async def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir, output_metrics_path, output_metrics_overall_path, use_llm=True, extract_answer=True, domain_fields=None, api_base_url=None, model_name=None):
     # Initialize domain metrics dictionary
+    #  filtered_data(完整数据), input_list(问题), output_list(模型输出)
+    print(f"evaluate.py开始运行 run_evaluation, filtered_data={filtered_data}")
+    print(f"evaluate.py开始运行 run_evaluation, input_list={input_list}")
+    print(f"evaluate.py开始运行 run_evaluation, output_list={output_list}")
+    print(f"evaluate.py开始运行 run_evaluation, filtered_data={task_type}")
+
     domain_metrics = defaultdict(lambda: {
         'total': 0,
         'correct': 0,
@@ -263,8 +306,10 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
         'pass@1': []
     })
 
-    # Helper function to get domain from item
+    # Helper function to get domain from item  （按领域/难度分组的指标统计）
     def get_domain(item):
+        if not domain_fields:  # 增加这一行，处理 None 或空列表的情况
+            return 'Unknown'
         for field in domain_fields:
             if field in item and item[field] is not None:
                 return item[field]
@@ -277,9 +322,9 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
         num_valid_answer = 0
 
         for item, input_prompt, result in zip(filtered_data, input_list, output_list):
-            if type(result) == str:
+            if type(result) == str:  # 若 result 是字符串 → item['Output'] = result
                 item['Output'] = result
-            else:
+            else:  # 若 result 是对象 → item['Output'] = result.outputs[0].text
                 item['Output'] = result.outputs[0].text
 
             if item['Output'] == '':
@@ -377,12 +422,13 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
                     avg_llm.append(0)
                 continue
 
-            # Get the labeled answer from the item
+            # Get the labeled answer from the item 获取标准答案。 优先级: item['answer'] → item['Correct Choice'] → item['answer_letter']
             labeled_answer = item.get('answer', '')  # Use get() to safely access the answer field
             if 'Correct Choice' in item and item['Correct Choice'] is not None:
                 labeled_answer = item['Correct Choice']
             elif 'answer_letter' in item and item['answer_letter'] is not None:
                 labeled_answer = item['answer_letter']
+            # 调用 evaluate_predictions() → 得到 (metric, pred_answer)
             metric, pred_answer = evaluate_predictions(
                 output=result, 
                 labeled_answer=labeled_answer,
@@ -392,12 +438,13 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
                 extract_answer=extract_answer
             )
             
+            # 赋值
             item['Pred_Answer'] = pred_answer
             item['Metrics'] = metric
             item['Question'] = input_prompt
 
             # Store data for batch LLM evaluation
-            if use_llm:
+            if use_llm:  # 若 use_llm=True: 批量调用 llm_evaluate_equivalence_batch()
                 questions_for_llm.append(input_prompt)
                 labeled_answers_for_llm.append(labeled_answer)
                 pred_answers_for_llm.append(pred_answer)
@@ -416,14 +463,15 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
 
         # Perform batch LLM evaluation if needed
         if use_llm and questions_for_llm:
-            llm_results = asyncio.run(llm_evaluate_equivalence_batch(
+            # llm_results = asyncio.run(llm_evaluate_equivalence_batch(
+            llm_results = await llm_evaluate_equivalence_batch(
                 questions=questions_for_llm,
                 labeled_answers=labeled_answers_for_llm,
                 pred_answers=pred_answers_for_llm,
                 extract_answer=extract_answer,
                 api_base_url=api_base_url,
                 model_name=model_name
-            ))
+            )
             
             # Update metrics with LLM results
             for item, (llm_result, llm_response) in zip(items_for_llm, llm_results):
@@ -476,22 +524,25 @@ def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir
     print(overall_metrics)
     
     # Save prediction results and metrics
+    print(f"run_evaluate.py开始 Save prediction results and metrics 每条数据的详细结果，路径={output_metrics_path}")
     with open(os.path.join(output_dir, output_metrics_path), mode='w', encoding='utf-8') as json_file:
         json.dump(filtered_data, json_file, indent=4, ensure_ascii=False)
 
     # ===== 新增：将 filtered_data 追加到 all.jsonl =====
+    print(f"run_evaluate.py开始 将 filtered_data 追加到 all.jsonl")
     all_jsonl_path = os.path.join(output_dir, 'all.jsonl')
     with open(all_jsonl_path, mode='a', encoding='utf-8') as jsonl_file:
         for item in filtered_data:
             simplified_item = {
                 "id": item.get("id"),
                 "answer": item.get("answer"),
-                "Pred_Answer": item.get("Pred_Answer"),
+                "Pred_Answer": item.get("Pred_Answer"),  # 若 extract_answer=False，直接返回完整输出；否则提取最后3行
                 "Output": item.get("Output"),
             }
             jsonl_file.write(json.dumps(simplified_item, ensure_ascii=False) + '\n')
     # ===================================================
 
+    print(f"run_evaluate.py开始 Save prediction results and metrics总体指标，路径={output_metrics_overall_path}")
     with open(os.path.join(output_dir, output_metrics_overall_path), mode='w', encoding='utf-8') as json_file:
         json.dump(overall_metrics, json_file, indent=4, ensure_ascii=False)
 

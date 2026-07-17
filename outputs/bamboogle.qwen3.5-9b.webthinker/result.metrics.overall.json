@@ -1,18 +1,18 @@
 {
-    "em": 1.0,
+    "em": 0.6666666666666666,
     "acc": 1.0,
-    "f1": 1.0,
-    "math_equal": 1.0,
-    "num_valid_answer": "1 of 1",
-    "llm_equal": 1.0,
+    "f1": 0.8333333333333334,
+    "math_equal": 0.6666666666666666,
+    "num_valid_answer": "3 of 3",
+    "llm_equal": 0.6666666666666666,
     "domain_metrics": {
         "Unknown": {
-            "total": 1,
-            "em": 1.0,
+            "total": 3,
+            "em": 0.6666666666666666,
             "acc": 1.0,
-            "f1": 1.0,
-            "math_equal": 1.0,
-            "llm_equal": 1.0
+            "f1": 0.8333333333333334,
+            "math_equal": 0.6666666666666666,
+            "llm_equal": 0.6666666666666666
         }
     }
 }

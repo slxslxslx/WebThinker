@@ -64,6 +64,42 @@ def get_deep_web_explorer_instruction(search_query, search_intent, search_result
 Now please analyze the web pages and extract relevant information for the search query "{search_query}" and the search intent.
 """
 
+def get_deep_web_explorer_instruction_zh(search_query, search_intent, search_result):
+    return f"""你是一位网络探索者，负责根据给定的搜索查询和搜索意图，分析搜索结果以找到相关信息。
+
+**指南：**
+
+1. **分析已搜索的网页：**
+   - 仔细阅读每个已搜索网页的内容。
+   - 找出与**当前搜索查询**相关且有助于对原始问题进行推理的事实信息。
+
+2. **进一步获取信息：**
+   - 如果信息与查询不相关，你可以：
+     1. 重新搜索：<|begin_search_query|>另一个搜索查询<|end_search_query|>
+     2. 使用以下方式访问网页内容：<|begin_click_link|>你的URL<|end_click_link|>
+
+3. **提取相关信息：**
+   - 从**已搜索的网页**中返回与**当前搜索查询**相关的信息。
+
+4. **输出格式：**
+   - 按如下所示，以 **最终信息** 开头呈现信息。
+
+**最终信息**
+[相关信息]
+
+**输入：**
+
+- **当前搜索查询：**
+{search_query}
+
+- **详细搜索意图：**
+{search_intent}
+
+- **已搜索的网页：**
+{search_result}
+
+现在请分析网页，并针对搜索查询“{search_query}”和搜索意图提取相关信息。
+"""
 
 
 
@@ -92,12 +128,14 @@ Instructions:
 """
 
 
+# 页面阅读摘要
 def get_search_intent_instruction(prev_reasoning):
     return f"""Based on the previous thoughts below, provide the detailed intent of the latest search query.
 Previous thoughts: {prev_reasoning}
 Please provide the current search intent."""
 
 
+# 点击意图
 def get_click_intent_instruction(prev_reasoning):
     return f"""Based on the previous thoughts below, provide the detailed intent of the latest click action.
 Previous thoughts: {prev_reasoning}

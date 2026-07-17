@@ -3,11 +3,11 @@
     "acc": 0.0,
     "f1": 0.0,
     "math_equal": 0.0,
-    "num_valid_answer": "1 of 1",
+    "num_valid_answer": "2 of 2",
     "llm_equal": 0.0,
     "domain_metrics": {
         "Unknown": {
-            "total": 1,
+            "total": 2,
             "em": 0.0,
             "acc": 0.0,
             "f1": 0.0,
