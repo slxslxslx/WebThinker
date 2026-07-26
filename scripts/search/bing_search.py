@@ -210,7 +210,7 @@ def extract_text_from_url(url, use_jina=False, jina_api_key=None, snippet: Optio
                     print(f"extract_text_from_url 爬虫 检测到错误，降级到WebParserClient")
                     if WebParserClient_url is None:  # WebParserClient_url 是否已设置?  否 → 直接返回错误字符串
                         # If WebParserClient is not available, return error message
-                        return f"Error extracting content: {str(e)}"
+                        return f"Error extracting content: page contains error indicators"
                     # If content has error, use WebParserClient as fallback
                     client = WebParserClient(WebParserClient_url)  # 是 → 调用远程解析服务 (POST /parse_urls)
                     results = client.parse_urls([url])
@@ -582,7 +582,7 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
                     print(f"extract_text_from_url 爬虫 检测到错误，降级到WebParserClient")
                     if WebParserClient_url is None:
                         # If WebParserClient is not available, return error message
-                        return f"Error extracting content: {str(e)}"
+                        return f"Error extracting content: page contains error indicators"
                     # If content has error, use WebParserClient as fallback
                     client = WebParserClient(WebParserClient_url)
                     results = client.parse_urls([url])
@@ -705,7 +705,7 @@ async def extract_pdf_text_async(url: str, session: aiohttp.ClientSession) -> st
     """
     print(f"开始执行 extract_pdf_text_async")
     try:
-        async with session.get(url, timeout=30, proxies=proxies) as response:  # Set timeout to 20 seconds
+        async with session.get(url, timeout=30) as response:  # Set timeout to 20 seconds  , proxies=proxies
             if response.status != 200:
                 return f"Error: Unable to retrieve the PDF (status code {response.status})"
             

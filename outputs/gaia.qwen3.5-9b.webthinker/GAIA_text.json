@@ -1,5 +1,649 @@
 [
     {
+        "id": 1,
+        "task_id": "17b5a6a3-bc87-42e8-b0fb-6ab0781ef2cc",
+        "Question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+        "answer": "34689",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “finding nemo main character”.\n2. Note the results, which state that the main character is a clownfish.\n3. Search the web for “usgs nonnative species database”.\n4. Click result for the Nonindigenous Aquatic Species site.\n5. Click “Marine Fishes”.\n6. Click “Species List of Nonindigenous Marine Fish”.\n7. Scroll through the list until I find the clown anenomefish, and click “Collection info”.\n8. Note the place that a clown anenomefish was found, in Fred Howard Park at the Gulf of Mexico.\n9. Search the web for “fred howard park florida zip code”.\n10. Note the zip code, 34689. Since only one clownfish was found before the year 2020, this is the answer.",
+            "Number of steps": "10",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Search engine\n2. Web browser",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 2,
+        "task_id": "04a04a9b-226c-43fd-b319-d5e89743676f",
+        "Question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+        "answer": "41",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Find how many articles were published in Nature in 2020 by Googling \"articles submitted to nature 2020\"\n2. Click through to Nature's archive for 2020 and filter the results to only provide articles, not other types of publications: 1002\n3. Find 4% of 1002 and round up: 40.08 > 41",
+            "Number of steps": "3",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. search engine\n2. calculator",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 3,
+        "task_id": "14569e28-c88c-43e4-8c32-097d35b9a67d",
+        "Question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+        "answer": "backtick",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Unlambda syntax\" online (optional).\n2. Opened https://en.wikipedia.org/wiki/Unlambda.\n3. Note that the hello world program is very similar in syntax to the code in this question.\n4. Go to the source referenced by the hello world program.\n5. From the referenced source, read what the components of the program do to understand that each period needs a backtick after the initial `r.\n6. Observe that in the given code, there are 12 periods but only 11 backticks after the initial `r, so the missing character is a backtick.",
+            "Number of steps": "6",
+            "How long did this take?": "15 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. Unlambda compiler (optional)",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 4,
+        "task_id": "e1fc63a2-da7a-432f-be78-7c4a95598703",
+        "Question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+        "answer": "17",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Googled Eliud Kipchoge marathon pace to find 4min 37sec/mile\n2. Converted into fractions of hours.\n3. Found moon periapsis in miles (225,623 miles).\n4. Multiplied the two to find the number of hours and rounded to the nearest 100 hours.",
+            "Number of steps": "4",
+            "How long did this take?": "20 Minutes",
+            "Tools": "1. A web browser.\n2. A search engine.\n3. A calculator.",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 6,
+        "task_id": "8e867cd7-cff9-4e6c-867a-ff5ddc2550be",
+        "Question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+        "answer": "3",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. I did a search for Mercedes Sosa\n2. I went to the Wikipedia page for her\n3. I scrolled down to \"Studio albums\"\n4. I counted the ones between 2000 and 2009",
+            "Number of steps": "4",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. web browser\n2. google search",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 7,
+        "task_id": "3627a8be-a77f-41bb-b807-7e1bd4c0ebdf",
+        "Question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+        "answer": "142",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Use search engine to search for \"British Museum search collection\" and navigate to the British Museum's collection search webpage.\n2. Select \"Museum number\" as search field and \"2012,5015.17\" in text box, then run search.\n3. Open the page for the single result and note that the description says that this is the shell of an individual of the Nassa gibbosula species.\n4. Use search engine to search for \"Nassa gibbosula\".\n5. Note that according to the search result from the World Register of Marine Species website, Nassa gibbosula is not an accepted species name.\n6. Open the page for Nassa gibbosula on the World Register of Marine Species website.\n7. Scan the page and note that the accepted species name is Tritia gibbosula.\n8. Use search engine to search for \"Science Advances 2021 Tritia gibbosula\".\n9. Find that the top result is an article from 2021 in Science Advances titled \"Early Middle Stone Age personal ornaments from Bizmoune Cave, Essaouira, Morocco\".\n10. Scan abstract and note that the article discusses beads made from Tritia gibbosula shells that date to at least 142 thousand years ago, giving a final answer of 142.",
+            "Number of steps": "10",
+            "How long did this take?": "12 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 8,
+        "task_id": "7619a514-5fa8-43ef-9143-83b66a43d7a4",
+        "Question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+        "answer": "04/15/18",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"numpy github\" on Google search.\n2. Opened the NumPy GitHub page.\n3. Clicked \"Issues\" in the repo tabs.\n4. Clicked \"Closed\" on the filter bar.\n5. Set the filter to the \"numpy.polynomial\" label.\n6. Set the filter to the \"06 - Regression\" label.\n7. Opened the oldest Regression post.\n8. Scrolled down to find when the Regression label was added (Apr 15, 2018).\n9. Converted to MM/DD/YY (04/15/18).",
+            "Number of steps": "9",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 9,
+        "task_id": "ec09fa32-d03f-4bf8-84b0-1f16922c3ae4",
+        "Question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+        "answer": "3",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "Step 1: Evaluate the problem statement provided in my user's prompt\nStep 2: Consider the probability of any ball on the platform earning the prize.\nStep 3: Evaluate the ball in position one. The probability of it earning the prize, P1, is 1/3\nStep 4: Using a calculator, evaluate the ball in position two. The probability of it earning the prize, P2, is the difference between 1 and the product of the complementary probabilities for each trial\nP2 = 1 - (2/3)(2/3)\nP2 = 5/9\nStep 5: Using a calculator, evaluate the ball in position three. The probability of it earning the prize, P3, is the difference between 1 and the product of the complementary probabilities for each trial\nP3 = 1 - (2/3)(2/3)(2/3)\nP3 = 19/27\nStep 6: Consider the possible outcomes of numbers higher than 3.\nStep 7: For each trial, either 1 or 2 balls from the ramp will advance to the platform. For any given selection, there is a 50% chance that the ball advances to position 2 or position 3.\nStep 8: As position three holds the highest chance of earning the prize, select the only ball known to occupy position three with certainty, ball 3.\nStep 9: Report the correct answer to my user, \"3\"",
+            "Number of steps": "9",
+            "How long did this take?": "1 minute",
+            "Tools": "None",
+            "Number of tools": "0"
+        }
+    },
+    {
+        "id": 10,
+        "task_id": "676e5e31-a554-4acc-9286-b60d90a92d26",
+        "Question": "In July 2, 1959 United States standards for grades of processed fruits, vegetables, and certain other products listed as dehydrated, consider the items in the \"dried and dehydrated section\" specifically marked as dehydrated along with any items in the Frozen/Chilled section that contain the whole name of the item, but not if they're marked Chilled. As of August 2023, what is the percentage (to the nearest percent) of those standards that have been superseded by a new version since the date given in the 1959 standards?",
+        "answer": "86",
+        "Level": 3,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"July 2, 1959 United States standards for grades of processed fruits, vegetables, and certain other products\" on Google.\n2. Opened https://upload.wikimedia.org/wikipedia/commons/0/06/United_States_standards_for_grades_of_processed_fruits%2C_vegetables%2C_and_certain_other_products_%28as_of_July_2%2C_1959%29_%28IA_unitedstatesstan14unit_4%29.pdf.\n3. Scrolled to the \"DRIED or DEHYDRATED\" section.\n4. Opened a new tab and searched \"united states standards for grades of dehydrated apples\".\n5. Opened https://www.ams.usda.gov/grades-standards/dehydrated-apples-grades-and-standards.\n6. Opened the \"U.S. Grade Standards for Dehydrated Apples (pdf)\" PDF.\n7. Checked the date against the 1959 standards.\n8. Repeated steps 4-7 for all dehydrated items in the \"DRIED or DEHYDRATED\" section:\n9. Grapefruit Juice, updated (running tally: 2/2)\n10. Orange Juice, updated (running tally: 3/3)\n11. Found all versions of the dehydrated items in Frozen or Chilled, except those marked Chilled: Apples; Grapefruit Juice, Concentrated; Grapefruit Juice and Orange Juice, Concentrated, Blended; Orange Juice, Concentrated\n12. Repeated steps 4-7 all those versions:\n13. Apples, not updated (running tally: 3/4)\n14. Grapefruit Juice, Concentrated, updated (running tally: 4/5)\n15. Grapefruit Juice and Orange Juice, Concentrated, Blended, updated (running tally: 5/6)\n16. Orange Juice, Concentrated, updated (running tally: 6/7)\n17. Calculated the percentage (6 / 7 * 100% = 85.7%).\n18. Rounded to the nearest percent (86%).",
+            "Number of steps": "14",
+            "How long did this take?": "20 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. PDF access\n4. Calculator",
+            "Number of tools": "4"
+        }
+    },
+    {
+        "id": 12,
+        "task_id": "2a649bb1-795f-4a01-b3be-9a01868dae73",
+        "Question": "What are the EC numbers of the two most commonly used chemicals for the virus testing method in the paper about SPFMV and SPCSV in the Pearl Of Africa from 2016? Return the semicolon-separated numbers in the order of the alphabetized chemicals.",
+        "answer": "3.1.3.1; 1.11.1.7",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Pearl of Africa\" on Google.\n2. Noted the answer from the results.\n3. Searched \"SPFMV and SPCSV in Uganda 2016 paper\" on Google.\n4. Opened \"Effects of Sweet Potato Feathery Mottle Virus and ...\" at https://onlinelibrary.wiley.com/doi/full/10.1111/jph.12451.\n5. Found the section on virus testing.\n6. Searched \"most commonly used chemicals for ELISA\" on Google.\n7. Noted horseradish peroxidase and alkaline phosphatase from the results.\n8. Searched \"horseradish peroxidase EC number\" on Google.\n9. Noted the answer from the featured text snippet (1.11.1.7).\n10. Searched \"alkaline phosphatase EC number\" on Google.\n11. Noted the answer from the featured text snippet (3.1.3.1).\n12. Alphabetized the chemicals.\n13. Put the numbers in the order of the chemicals.",
+            "Number of steps": "13",
+            "How long did this take?": "15 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 13,
+        "task_id": "87c610df-bef7-4932-b950-1d83ef4e282b",
+        "Question": "In April of 1977, who was the Prime Minister of the first place mentioned by name in the Book of Esther (in the New International Version)?",
+        "answer": "Morarji Desai",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “Book of Esther NIV”.\n2. Click search result to read the text of the first chapter.\n3. Note the first place named, India.\n4. Search the web for “prime ministers of India list”.\n5. Click Wikipedia result.\n6. Scroll down to find the prime minister during the specified timeframe, Morarji Desai.",
+            "Number of steps": "6",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Search engine\n2. Web browser",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 15,
+        "task_id": "dd3c7503-f62a-4bd0-9f67-1b63b94194cc",
+        "Question": "Use density measures from the chemistry materials licensed by Marisa Alviar-Agnew & Henry Agnew under the CK-12 license in LibreText's Introductory Chemistry materials as compiled 08/21/2023.\n\nI have a gallon of honey and a gallon of mayonnaise at 25C. I remove one cup of honey at a time from the gallon of honey. How many times will I need to remove a cup to have the honey weigh less than the mayonaise? Assume the containers themselves weigh the same.",
+        "answer": "6",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search \"LibreText density mayonnaise\"\n2. Click result, confirm the correct license.\n3. Search \"cm^3 to 1 cup\"\n4. Use results with density measures to form the equation (16*236.588)(1.420 - 0.910)/(236.588*1.420)\n5. Round up",
+            "Number of steps": "5",
+            "How long did this take?": "20 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. Calculator",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 16,
+        "task_id": "5d0080cb-90d7-4712-bc33-848150e917d3",
+        "Question": "What was the volume in m^3 of the fish bag that was calculated in the University of Leicester paper \"Can Hiccup Supply Enough Fish to Maintain a Dragon’s Diet?\"",
+        "answer": "0.1777",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched '\"Can Hiccup Supply Enough Fish to Maintain a Dragon’s Diet?\"' on Google.\n2. Opened \"Can Hiccup Supply Enough Fish to Maintain a Dragon’s Diet?\" at https://journals.le.ac.uk/ojs1/index.php/jist/article/view/733.\n3. Clicked \"PDF\".\n4. Found the calculations for the volume of the fish bag and noted them.",
+            "Number of steps": "4",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. PDF access",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 19,
+        "task_id": "46719c30-f4c3-4cad-be07-d5cb21eee6bb",
+        "Question": "Of the authors (First M. Last) that worked on the paper \"Pie Menus or Linear Menus, Which Is Better?\" in 2015, what was the title of the first paper authored by the one that had authored prior papers?",
+        "answer": "Mapping Human Oriented Information to Software Agents for Online Systems Usage",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Pie Menus or Linear Menus, Which Is Better?\" on Google.\n2. Opened \"Pie Menus or Linear Menus, Which Is Better?\" on https://oda.oslomet.no/oda-xmlui/handle/10642/3162.\n3. Clicked each author's name.\n4. Noted the name that had no other papers listed.\n5. Searched \"Murano, Pietro\" on Google.\n6. Opened http://www.pietromurano.org/.\n7. Clicked \"Publications\".\n8. Found the earliest paper he contributed to.",
+            "Number of steps": "8",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 22,
+        "task_id": "4b6bb5f7-f634-410e-815d-e673ab7f8632",
+        "Question": "In Series 9, Episode 11 of Doctor Who, the Doctor is trapped inside an ever-shifting maze. What is this location called in the official script for the episode? Give the setting exactly as it appears in the first scene heading.",
+        "answer": "THE CASTLE",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “Doctor Who series 9 episode 11 official script”.\n2. Click result on the BBC website.\n3. Scroll through the PDF to read the script, noting that it takes place in a mechanical castle location.\n4. Scroll back to the first scene heading to note the answer, THE CASTLE",
+            "Number of steps": "4",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. PDF viewer",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 23,
+        "task_id": "f0f46385-fc03-4599-b5d3-f56496c3e69f",
+        "Question": "In terms of geographical distance between capital cities, which 2 countries are the furthest from each other within the ASEAN bloc according to wikipedia? Answer using a comma separated list, ordering the countries by alphabetical order.",
+        "answer": "Indonesia, Myanmar",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for \"ASEAN bloc\".\n2. Click the Wikipedia result for the ASEAN Free Trade Area.\n3. Scroll down to find the list of member states.\n4. Click into the Wikipedia pages for each member state, and note its capital.\n5. Search the web for the distance between the first two capitals. The results give travel distance, not geographic distance, which might affect the answer.\n6. Thinking it might be faster to judge the distance by looking at a map, search the web for \"ASEAN bloc\" and click into the images tab.\n7. View a map of the member countries. Since they're clustered together in an arrangement that's not very linear, it's difficult to judge distances by eye.\n8. Return to the Wikipedia page for each country. Click the GPS coordinates for each capital to get the coordinates in decimal notation.\n9. Place all these coordinates into a spreadsheet.\n10. Write formulas to calculate the distance between each capital.\n11. Write formula to get the largest distance value in the spreadsheet.\n12. Note which two capitals that value corresponds to: Jakarta and Naypyidaw.\n13. Return to the Wikipedia pages to see which countries those respective capitals belong to: Indonesia, Myanmar.",
+            "Number of steps": "13",
+            "How long did this take?": "45 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. Microsoft Excel / Google Sheets",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 24,
+        "task_id": "384d0dd8-e8a4-4cfe-963c-d37f256e7662",
+        "Question": "In the NCATS PubChem compound database for Food Additive Status classification, find the compound that has a molecular weight of 100 g/mol or less, 6 heavy atoms, 1 or fewer hydrogen bond acceptors, and a complexity between 10 and 15. Of the shared gene-chemical co-occurrences between its two possible enzyme transformations, what is the PubChem CID of the heaviest by molecular weight?",
+        "answer": "4192",
+        "Level": 3,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"NCATS PubChem compound database\" on Google.\n2. Opened \"PubChem\" on the NCATS NIH website.\n3. Clicked on the \"PubChem Compound\" link.\n4. Clicked on the \"Classification Browser\" link.\n5. Expanded \"Food Additives and Ingredients\" in the list.\n6. Clicked on the number link next to \"Food Additive Status\".\n7. Opened the filters and set them to maximum 100 g/mol weight, minimum 6 heavy atoms, maximum 1 H-bond acceptor, complexity 10-15.\n8. Opened the resulting \"HEXANE\" page.\n9. Scrolled to 10.6 Pharmacology and Biochemistry > Transformations.\n10. Opened the two enzyme transformations' pages (CYP2B6 and CYP2E1).\n11. Opened each one's gene-chemical co-occurrences full list.\n12. Opened each chemical they shared a co-occurrence with.\n13. Compared the weights to find the heaviest (Midazolam).\n14. Noted its PubChem CID (4192).",
+            "Number of steps": "14",
+            "How long did this take?": "20 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 25,
+        "task_id": "e4e91f1c-1dcd-439e-9fdd-cb976f5293fd",
+        "Question": "I need to fact-check a citation. This is the citation from the bibliography:\n\nGreetham, David. \"Uncoupled: OR, How I Lost My Author(s).\" Textual Cultures: Texts, Contexts, Interpretation, vol. 3 no. 1, 2008, p. 45-46. Project MUSE, doi:10.2979/tex.2008.3.1.44.\n\nAnd this is the in-line citation:\n\nOur relationship with the authors of the works we read can often be “obscured not by a \"cloak of print\" but by the veil of scribal confusion and mis-transmission” (Greetham 45-46).\n\nDoes the quoted text match what is actually in the article? If Yes, answer Yes, otherwise, give me the word in my citation that does not match with the correct one (without any article).",
+        "answer": "cloak",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “greetham uncoupled project muse”.\n2. Click result, an article that matches the given citation.\n3. Ctrl-F for “obscured”.\n4. Find the quote from the question, which describes a “veil of print”, not a cloak.\n5. Express the answer in the specified format, No.",
+            "Number of steps": "5",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Search engine\n2. Web browser",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 26,
+        "task_id": "56137764-b4e0-45b8-9c52-1866420c3df5",
+        "Question": "Which contributor to the version of OpenCV where support was added for the Mask-RCNN model has the same name as a former Chinese head of government when the names are transliterated to the Latin alphabet?",
+        "answer": "Li Peng",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Use search engine to search for \"OpenCV change log\".\n2. Open the top result from GitHub and search the page for \"Mask-RCNN\".\n3. Observe that support for Mask-RCNN model was added in OpenCV version 4.0.0.\n4. Expand the two lists of contributors for version 4.0.0.\n5. Go to the Wikipedia page for head of government. \n6. Scan through and note that for China, the head of government is the premier.\n7. Go to the Wikipedia page for premier of the People's Republic of China.\n8. Go to the linked page for List of premiers of the People's Republic of China.\n9. Compare the list of OpenCV version 4.0.0 contributors' names and the list of premiers of China to find that Li Peng is present in both lists.",
+            "Number of steps": "9",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 27,
+        "task_id": "de9887f5-ead8-4727-876f-5a4078f8598c",
+        "Question": "What integer-rounded percentage of the total length of the harlequin shrimp recorded in Omar Valencfia-Mendez 2017 paper was the sea star fed to the same type of shrimp in G. Curt Fiedler's 2002 paper?",
+        "answer": "22",
+        "Level": 3,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Omar Valencfia-Mendez 2017 shrimp paper\" on Google.\n2. Opened \"Decapoda: Palaemonidae: Hymenocera picta Dana, 1852) ...\" on https://www.threatenedtaxa.org/index.php/JoTT/article/view/3238.\n3. Clicked \"PDF/A\".\n4. Found the length of the recorded shrimp as TL in the paper (4.5cm).\n5. Searched \"G. Curt Fiedler 2002 shrimp paper\" on Google.\n6. Opened \"(PDF) The influence of social environment on sex ...\" on https://www.researchgate.net/publication/232696279_The_influence_of_social_environment_on_sex_determination_in_harlequin_shrimp_Hymenocera_picta_Decapoda_Gnathophyllidae.\n7. Found the size of the sea star fed to the shrimp (1cm).\n8. Took the percentage (1 / 4.5 * 100% = 22.22222%).\n9. Rounded to the nearest integer (22%).",
+            "Number of steps": "9",
+            "How long did this take?": "15 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. PDF access\n4. Calculator",
+            "Number of tools": "4"
+        }
+    },
+    {
+        "id": 30,
+        "task_id": "0ff53813-3367-4f43-bcbd-3fd725c1bf4b",
+        "Question": "What two-word type of model did Manash Pratim Kashyap's and PS Fader's studies in customer retention studies published during 2018-2019 have in common (no punctuation)?",
+        "answer": "beta geometric",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Manash Pratim Kashyap customer retention\" on Google.\n2. Opened https://www.journalijar.com/article/26843/a-simple-model-for-analyzing-the-customer-retention-comparing-rural-and-urban-store/.\n3. Noted \"discrete time beta geometric model\" in the abstract.\n4. Searched \"PS Fader customer retention\" on Google.\n5. Opened https://www.sciencedirect.com/science/article/abs/pii/S1094996807700233.\n6. Noted \"basic model (known as a “shifted-beta-geometric”)\" in the abstract.\n7. Extracted the two words in common.",
+            "Number of steps": "6",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 31,
+        "task_id": "983bba7c-c092-455f-b6c9-7857003d48fc",
+        "Question": "What animals that were mentioned in both Ilias Lagkouvardos's and Olga Tapia's papers on the alvei species of the genus named for Copenhagen outside the bibliographies were also present in the 2021 article cited on the alvei species' Wikipedia page about a multicenter, randomized, double-blind study?",
+        "answer": "mice",
+        "Level": 3,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"alvei copenhagen\" on Google.\n2. Opened https://en.wikipedia.org/wiki/Hafnia_(bacterium).\n3. Searched \"Ilias Lagkouvardos hafnia alvei\" on Google.\n4. Opened https://www.mdpi.com/2076-2607/11/1/123?type=check_update&version=2.\n5. Opened a new tab.\n6. Searched \"Olga Tapia hafnia alvei\" on Google.\n7. Opened https://pubmed.ncbi.nlm.nih.gov/36080356/.\n8. Found all animals mentioned in the first paper.\n9. Searched each animal from the first paper in the second paper.\n10. Noted the animals mentioned in both outside the bibliographies.\n11. Went back to the Wikipedia article.\n12. Opened the link in the references to \"The Probiotic Strain H. alvei HA4597® Improves Weight Loss in Overweight Subjects under Moderate Hypocaloric Diet: A Proof-of-Concept, Multicenter Randomized, Double-Blind Placebo-Controlled Study\".\n13. Opened the PDF.\n14. Found the animals shared by all three papers.",
+            "Number of steps": "14",
+            "How long did this take?": "25 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. PDF access",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 32,
+        "task_id": "a7feb290-76bb-4cb7-8800-7edaf7954f2f",
+        "Question": "How many High Energy Physics - Lattice articles listed in January 2020 on Arxiv had ps versions available?",
+        "answer": "31",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"arxiv\" on Google.\n2. Opened the top result of https://arxiv.org/.\n3. Opened the High Energy Physics - Lattice section.\n4. Set the date to 2020 January.\n5. Counted the number of articles with \"ps\" formats available on each page.\n6. Added the numbers from each page to get the total.",
+            "Number of steps": "6",
+            "How long did this take?": "15 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. Calculator",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 34,
+        "task_id": "2d83110e-a098-4ebb-9987-066c06fa42d0",
+        "Question": ".rewsna eht sa \"tfel\" drow eht fo etisoppo eht etirw ,ecnetnes siht dnatsrednu uoy fI",
+        "answer": "Right",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Read the instructions in reverse",
+            "Number of steps": "1",
+            "How long did this take?": "1 minute",
+            "Tools": "1. A word reversal tool / script",
+            "Number of tools": "0"
+        }
+    },
+    {
+        "id": 35,
+        "task_id": "33d8ea3b-6c6b-4ff1-803d-7e270dea8a57",
+        "Question": "What is the minimum number of page links a person must click on to go from the english Wikipedia page on The Lord of the Rings (the book) to the english Wikipedia page on A Song of Ice and Fire (the book series)? In your count, include each link you would click on to get to the page. Use the pages as they appeared at the end of the day on July 3, 2023.",
+        "answer": "2",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “lord of the rings wikipedia”.\n2. Click on Wikipedia result.\n3. Click “View history” to see if the page has been edited since July 3, 2023.\n4. Since it hasn’t been, return to the current revision.\n5. Ctrl-F for “song” to see if A Song of Ice and Fire is linked to on this page.\n6. Not seeing A Song of Ice and Fire on the current page, search for a link to a page that will likely mention A Song of Ice and Fire.\n7. Click the link for “High fantasy”.\n8. Click “View history” to see if the page has been edited since July 3, 2023.\n9. Since it hasn’t been, return to the current revision.\n10. Ctrl-F for “song”, and find a link to A Song of Ice and Fire.\n11. Count the links: the High fantasy page and the A Song of Ice and Fire page make two.",
+            "Number of steps": "11",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. Counter",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 38,
+        "task_id": "e8cb5b03-41e0-4086-99e5-f6806cd97211",
+        "Question": "I went to Virtue restaurant & bar in Chicago for my birthday on March 22, 2021 and the main course I had was delicious!  Unfortunately, when I went back about a month later on April 21, it was no longer on the dinner menu.  Using the Wayback Machine, can you help me figure out which main course was on the dinner menu for Virtue on March 22, 2021 but not April 21, 2021? Answer using the singular form, without articles.",
+        "answer": "shrimp",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for \"Virtue restaurant & bar Chicago\"\n2. Find the restaurant's website, https://www.virtuerestaurant.com\n3. Find the page for the dinner menu, https://www.virtuerestaurant.com/menus/\n4. Paste the URL of this page into the Wayback Machine at web.archive.org\n5. Open the versions of the page archived on March 22, 2021 and April 21, 2021\n6. Ensure that both pages are open to the \"dinner menu\" tab\n7. Find the \"large ration\" that was present on the March 22 version of the menu but not April 21: shrimp",
+            "Number of steps": "7",
+            "How long did this take?": "30 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. Access to the Internet Archive, web.archive.org\n4. Text processing/diff tool",
+            "Number of tools": "4"
+        }
+    },
+    {
+        "id": 39,
+        "task_id": "27d5d136-8563-469e-92bf-fd103c28b57c",
+        "Question": "¬(A ∧ B) ↔ (¬A ∨ ¬B)\n¬(A ∨ B) ↔ (¬A ∧ ¬B)\n(A → B) ↔ (¬B → ¬A)\n(A → B) ↔ (¬A ∨ B)\n(¬A → B) ↔ (A ∨ ¬B)\n¬(A → B) ↔ (A ∧ ¬B)\n\nWhich of the above is not logically equivalent to the rest? Provide the full statement that doesn't fit.",
+        "answer": "(¬A → B) ↔ (A ∨ ¬B)",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Determine the truth values of the first statement: Recognize this is one of De Morgan's Laws showing how to distribute negation over the and conjunction - so it is a tautology.\n2. Determine the truth values of the second statement: Recognize this is one of De Morgan's Laws showing how to distribute negation over the or - so it is a tautology.\n3. Determine the truth values of the third statement: Recognize this is the definition of the contrapositive - so it is a tautology.\n4. Determine the truth values of the fourth statement: Recognize this as an alternative way of stating the conditional - so it is a tautology.\n5. Determine the truth values of the fifth statement: I don't recognize this, so check its truth values:\n6. A: True, B: True |  (¬A → B) ↔ (A ∨ ¬B) = (¬T → T) ↔ (T ∨ ¬T) = (F → T) ↔ (T ∨ F) = T ↔ T = T\n7. A: True, B: False |  (¬A → B) ↔ (A ∨ ¬B) = (¬T → F) ↔ (T ∨ ¬F) = (F → F) ↔ (T ∨ T) = T ↔ T = T\n8. A: False, B: True |  (¬A → B) ↔ (A ∨ ¬B) = (¬F → T) ↔ (F ∨ ¬T) = (T → T) ↔ (F ∨ ¬T) = T ↔ (F ∨ F) = T ↔ F = F\n9. The fifth statement is not a tautology so is the statement that is not logically equivalent. We were asked for only one statement, so can stop here.",
+            "Number of steps": "9",
+            "How long did this take?": "5-20 minutes",
+            "Tools": "None",
+            "Number of tools": "0"
+        }
+    },
+    {
+        "id": 40,
+        "task_id": "dc28cf18-6431-458b-83ef-64b3ce566c10",
+        "Question": "My family reunion is this week, and I was assigned the mashed potatoes to bring. The attendees include my married mother and father, my twin brother and his family, my aunt and her family, my grandma and her brother, her brother's daughter, and his daughter's family. All the adults but me have been married, and no one is divorced or remarried, but my grandpa and my grandma's sister-in-law passed away last year. All living spouses are attending. My brother has two children that are still kids, my aunt has one six-year-old, and my grandma's brother's daughter has three kids under 12. I figure each adult will eat about 1.5 potatoes of mashed potatoes and each kid will eat about 1/2 a potato of mashed potatoes, except my second cousins don't eat carbs. The average potato is about half a pound, and potatoes are sold in 5-pound bags. How many whole bags of potatoes do I need? Just give the number.",
+        "answer": "2",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Calculate the number of adults (mother, father, brother, brother's wife, aunt, aunt's husband, grandma, grandma's brother, grandma's brother's daughter, grandma's brother's daughter's husband, me = 11).\n2. Calculate the number of children (niece, nephew, cousin, grandma's brother's daughter's kids x3 = 6).\n3. Subtract the number of second cousins (grandma's brother's daughter's kids) (6 - 3 = 3).\n4. Calculate the adult potatoes (11 * 1.5 = 16.5).\n5. Calculate the child potatoes (3 * 0.5 = 1.5).\n6. Add to get the total potatoes (16.5 + 1.5 = 18).\n7. Multiply to get the pounds of potatoes (18 * 0.5 = 9 pounds).\n8. Calculate the number of 5-lb bags needed (9 / 5 = 1.8).\n9. Round up to get total bags (2).",
+            "Number of steps": "9",
+            "How long did this take?": "8 minutes",
+            "Tools": "1. Calculator",
+            "Number of tools": "1"
+        }
+    },
+    {
+        "id": 41,
+        "task_id": "b816bfce-3d80-4913-a07d-69b752ce6377",
+        "Question": "In Emily Midkiff's June 2014 article in a journal named for the one of Hreidmar's sons that guarded his house, what word was quoted from two different authors in distaste for the nature of dragon depictions?",
+        "answer": "fluffy",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Hreidmar's sons\" on Google.\n2. Opened https://en.wikipedia.org/wiki/Hrei%C3%B0marr.\n3. Noted Fafnir guarded his house.\n4. Searched \"Emily Midkiff June 2014 Fafnir\" on Google.\n5. Opened \"Fafnir 2/2014 |\" at http://journal.finfar.org/journal/archive/fafnir-22014/.\n6. Clicked the title '“Dragons are Tricksy”: The Uncanny Dragons of Children’s Literature'.\n7. Found the word in quotation marks from two different authors (Ruth Stein and Margaret Blount) in the text.",
+            "Number of steps": "7",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 42,
+        "task_id": "f46b4380-207e-4434-820b-f32ce04ae2a4",
+        "Question": "It is 1999. Before you party like it is 1999, please assist me in settling a bet.\n\nFiona Apple and Paula Cole released albums prior to 1999. Of these albums, which didn't receive a letter grade from Robert Christgau? Provide your answer as a comma delimited list of album titles, sorted alphabetically.",
+        "answer": "Harbinger, Tidal",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. search \"Fiona Apple discography\"\n2. find her album released prior to 1999 was \"Tidal\"\n3. search \"Paula Cole discography\"\n4. find her album released prior to 1999 was \"This Fire\" and \"Harbinger\".\n5. search \"Robert Christgau\"\n6. use his website to search \"Fiona Apple\"\n7. note his review for Tidal was an emoticon, not a letter grade\n8. use his website to search \"Paula Cole\"\n9. note his review for This Fire was a C+ and that he did not review Harbinger.",
+            "Number of steps": "9",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. web browser\n2. search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 43,
+        "task_id": "72e110e7-464c-453c-a309-90a95aed6538",
+        "Question": "Under DDC 633 on Bielefeld University Library's BASE, as of 2020, from what country was the unknown language article with a flag unique from the others?",
+        "answer": "Guatemala",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"Bielefeld University Library's BASE\" on Google.\n2. Opened https://www.base-search.net/.\n3. Clicked \"Browsing\".\n4. Selected Clicked \"Dewey Decimal Classification (DDC) > 6 > 63 > 633.\n5. Refined to Unknown Language.\n6. Found the only article with a flag unique from the others in the search from pre-2020.\n7. Copied the country name from the institution.",
+            "Number of steps": "7",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 44,
+        "task_id": "05407167-39ec-4d3a-a234-73a9120c325d",
+        "Question": "In the 2018 VSCode blog post on replit.com, what was the command they clicked on in the last video to remove extra lines?",
+        "answer": "Format Document",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Opened replit.com.\n2. Clicked \"Blog\".\n3. Searched \"vscode\".\n4. Opened \"Zero Setup VSCode Intelligence\" from 2018.\n5. Scrolled down to the bottom video.\n6. Noted the command used (Format Document).",
+            "Number of steps": "6",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Web browser\n2. GIF parsing tools",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 45,
+        "task_id": "b9763138-c053-4832-9f55-86200cb1f99c",
+        "Question": "Compute the check digit the Tropicos ID for the Order Helotiales would have if it were an ISBN-10 number.",
+        "answer": "3",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search \"Tropicos ID Order Helotiales\"\n2. Find the correct ID on the first result\n3. Search \"isbn 10 check digit calculator\" or calculate check digit by hand",
+            "Number of steps": "3",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. web browser\n2. search engine\n3. calculator",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 46,
+        "task_id": "16d825ff-1623-4176-a5b5-42e0f5c2b0ac",
+        "Question": "What time was the Tri-Rail train that carried the most passengers on May 27, 2019 scheduled to arrive in Pompano Beach? Express your answer in the 12-hour digital clock format without leading zero if any, and include whether it is AM or PM.",
+        "answer": "6:41 PM",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “tri rail ridership may 2019”.\n2. Click result for Tri-Rail website.\n3. Click drop-down for 2019.\n4. Click PDF for May 2019 ridership report.\n5. Scroll down to find the statistics for each train.\n6. Locate the ridership numbers for the 27th, and scroll to find the train with the highest number for that day: train number P685.\n7. Search the web for “tri rail schedule may 2019”.\n8. Click result for Tri-Rail website.\n9. Noticing that the train doesn’t appear on the weekday schedule, click the link for the weekend/holiday schedule. May 27th may have been a holiday.\n10. Locate the time that P685 is scheduled to arrive at Pompano Beach: 6:41 PM.\n11. To confirm, search “may 2019 holidays”.\n12. Verify that May 27th, 2019 was the Memorial Day holiday.\n13. Since the Tri-Rail website didn’t give a date for its schedule, search the web for “tri rail schedule changes” to see if the schedule has changed since 2019.\n14. The only result mentioning a schedule change dates to 2015, so 6:41 PM seems like the answer.",
+            "Number of steps": "14",
+            "How long did this take?": "5-10 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. PDF viewer",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 49,
+        "task_id": "544b7f0c-173a-4377-8d56-57b36eb26ddf",
+        "Question": "In Valentina Re’s contribution to the 2017 book “World Building: Transmedia, Fans, Industries”, what horror movie does the author cite as having popularized metalepsis between a dream world and reality? Use the complete name with article if any.",
+        "answer": "A Nightmare on Elm Street",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Search the web for “world building transmedia fans industries”.\n2. Click link to PDF of the book.\n3. Navigate to the Media Cited section of the essay written by Valentina Re.\n4. Identify the horror movie, A Nightmare on Elm Street.\n5. Navigate to its mention in the essay, to confirm that it does relate to metalepsis from a dream world.",
+            "Number of steps": "5",
+            "How long did this take?": "5-10 minutes",
+            "Tools": "1. Search engine\n2. Web browser\n3. PDF viewer",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 50,
+        "task_id": "42576abe-0deb-4869-8c63-225c2d75a95a",
+        "Question": "In the fictional language of Tizin, basic sentences are arranged with the Verb first, followed by the direct object, followed by the subject of the sentence. I want to express my love for apples to my Tizin friend. \n\nThe word that indicates oneself is \"Pa\" is the nominative form, \"Mato\" is the accusative form, and \"Sing\" is the genitive form. \n\nThe root verb that indicates an intense like for something is \"Maktay\". When it is used in the present, it is used in it's root form, when it is used in the preterit past, it is \"Tay\", and when it is used in the imperfect past, it is \"Aktay\". It is used differently than in English, and is better translated as \"is pleasing to\", meaning that the thing doing the liking is actually the object of the sentence rather than the subject.\n\nThe word for apples is borrowed from English in Tizin, and so it is \"Apple\" is the nominative form, \"Zapple\" is the accusative form, and \"Izapple\" is the genitive form. \n\nPlease translate \"I like apples\" to Tizin.",
+        "answer": "Maktay mato apple",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Determine the order of words from the prompt (Verb - Object - Subject).\n2. Determine the present form of Like (\"Maktay\")\n3. Determined that since the person doing the liking is the object of the sentence, the next word must be the one for oneself in object form.\n4. Determined the accusative form for onesself (\"mato\").\n5. Determined the nominative form for apple. (\"apple\").\n6. Put the words together in the correct order.",
+            "Number of steps": "6",
+            "How long did this take?": "2 minutes",
+            "Tools": "None",
+            "Number of tools": "0"
+        }
+    },
+    {
+        "id": 51,
+        "task_id": "6b078778-0b90-464d-83f6-59511c811b01",
+        "Question": "The Metropolitan Museum of Art has a portrait in its collection with an accession number of 29.100.5. Of the consecrators and co-consecrators of this portrait's subject as a bishop, what is the name of the one who never became pope?",
+        "answer": "Alfonso Visconti",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. I searched for \"Metropolitan Museum of Art search collection\" using a search engine to get to the \"Search the Collection\" page on the Metropolitan Museum of Art's website.\n2. I selected \"Accession Number\" in the search field dropdown and entered \"29.100.5\" into the text input, noting that the only result is a portrait titled \"Cardinal Fernando Niño de Guevara (1541–1609)\"\n3. I went to Fernando Niño de Guevara's Wikipedia page and noted that he was consecrated bishop by Pope Clement VIII with Camillo Borghese and Alfonso Visconti as co-consecrators.\n4. I eliminated Pope Clement VIII as the answer since he was obviously a pope based on his title.\n5. I went to Camillo Borghese's Wikipedia page and noted that he became Pope Paul V, eliminating him as the answer.\n6. I went to Alfonso Visconti's Wikipedia page and noted that he never became pope, so the answer to the question is \"Alfonso Visconti\".",
+            "Number of steps": "6",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 52,
+        "task_id": "b415aba4-4b68-4fc6-9b89-2c812e55a3e1",
+        "Question": "In Nature journal's Scientific Reports conference proceedings from 2012, in the article that did not mention plasmons or plasmonics, what nano-compound is studied? Don't use the prefix nano in your answer if there is one.",
+        "answer": "diamond",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"nature scientific reports\" on Google.\n2. Opened https://www.nature.com/srep/.\n3. Selected Explore Content > Research Articles.\n4. Filtered for Conference Proceedings from 2012.\n5. Opened each article link.\n6. Checked for \"plasmon\" or \"plasmonic\".\n7. Noted the nano-compound in the article that did not include either.",
+            "Number of steps": "7",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 54,
+        "task_id": "08cae58d-4084-4616-b6dd-dd6534e4825b",
+        "Question": "According to Google Finance, when was the first year the Apple stock went above $50 (without adjusting for stock split)?",
+        "answer": "2018",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. typed in \"Google finance apple\" on browser\n2. clicked first link\n3. clicked \"max\" to display entire history of apple stock\n4. hovered mouse around the area that line crosses over $50\n5. noted the date",
+            "Number of steps": "5",
+            "How long did this take?": "4 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. code/data analysis tools",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 56,
+        "task_id": "2dfc4c37-fec1-4518-84a7-10095d30ad75",
+        "Question": "According to Box Office Mojo's 2020 Worldwide Box Office list, how many of the top 10 highest-grossing worldwide movies are also on the top 10 highest-grossing domestic movies? Your answer should be a numerical integer value.",
+        "answer": "6",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Google searched \"Box Office Mojo's 2020 Worldwide Box Office\".\n2. Clicked on the first result: Box Office Mojo, https://www.boxofficemojo.com/year/world/2020/, 2020 Worldwide Box Office.\n3. Looked at the top 10 highest-grossing worldwide movies of 2020: 1. The Eight Hundred, 2. Demon Slayer the Movie: Mugen Train, 3. Bad Boys for Life, 4. My People, My Homeland, 5. Tenet, 6. Sonic the Hedgehog, 7. Dolittle, 8. Legend of Deification, 9. A Little Red Flower, 10. The Croods: A New Age.\n4. Clicked on the column labeled \"Domestic\" to sort by highest-grossing domestic movies of 2020.\n5. Looked at the first 10 movies on the list: Bad Boys for Life, Sonic the Hedgehog, Birds of Prey, Dolittle, The Invisible Man, The Call of the Wild, Onward, The Croods: A New Age, Tenet, Demon Slayer the Movie: Mugen Train.\n6. For each of these movies: If the number under \"Rank\" is less than or equal to 10, then the movie is also among the top 10 highest-grossing worldwide movies of 2020.\n7. Form the final list: Bad Boys for Life, Sonic the Hedgehog, Dolittle, The Croods: A New Age, Tenet, Demon Slayer the Movie: Mugen Train.\n8. Count the number of movies on the list: 6,",
+            "Number of steps": "8",
+            "How long did this take?": "15 minutes",
+            "Tools": "1. Web Browser\n2. Search Engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 57,
+        "task_id": "935e2cff-ae78-4218-b3f5-115589b19dae",
+        "Question": "In the year 2022, and before December, what does \"R\" stand for in the three core policies of the type of content that was violated in the public logs on the Legume Wikipedia page?",
+        "answer": "research",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Searched \"legume wikipedia\" on Google.\n2. Opened \"Legume\" on Wikipedia.\n3. Clicked \"View history\".\n4. Clicked \"View logs for this page\".\n5. Checked all types of logs.\n6. Set the date to November 2022.\n7. Followed the BLP link of the violation.\n8. Noted the meaning of \"R\".",
+            "Number of steps": "8",
+            "How long did this take?": "10 minutes",
+            "Tools": "1. Web browser\n2. Search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 58,
+        "task_id": "4fc2f1ae-8625-45b5-ab34-ad4433bc21f8",
+        "Question": "Who nominated the only Featured Article on English Wikipedia about a dinosaur that was promoted in November 2016?",
+        "answer": "FunkMonk",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Search \"Wikipedia featured articles promoted in november 2016\"\n2. Click through to the appropriate page and find the person who nominated Giganotosaurus.",
+            "Number of steps": "2",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. web browser\n2. search engine",
+            "Number of tools": "2"
+        }
+    },
+    {
+        "id": 59,
+        "task_id": "5188369a-3bbe-43d8-8b94-11558f909a08",
+        "Question": "What writer is quoted by Merriam-Webster for the Word of the Day from June 27, 2022?",
+        "answer": "Annie Levin",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Search \"merriam-webster word of the day\" on Google search.\n2. Opened the top \"Word of the Day\" result from the Merriam-Webster dictionary online.\n3. Clicked \"SEE ALL WORDS OF THE DAY\" at the bottom.\n4. Scrolled down to June 27, 2022.\n5. Opened the Word of the Day (\"jingoism\").\n6. Scrolled down and identified context quote for \"jingoism\".\n7. Noted the name attributed to the quote. ",
+            "Number of steps": "7",
+            "How long did this take?": "8 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. Audio capability",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 60,
+        "task_id": "9f41b083-683e-4dcf-9185-ccfeaa88fa45",
+        "Question": "How many pages if the 2023 IPCC report (85 pages version) mentions nuclear energy?",
+        "answer": "0",
+        "Level": 2,
+        "Annotator_Metadata": {
+            "Steps": "1. Open a web browser\n2. Go to a search engine\n3. Search for \"2023 IPCC report\"\n4. Click on the link for \"AR6 Synthesis Report: Climate Change 2023\" \n5. Click on \"Read the Report\"\n6. Click on \"SYR (Full volume)\n7. Check the page count of the PDF\n8. Go back to the previous page (report is too long)\n9. Click on \"Longer Report\"\n10. Check the page count of the PDF\n11. Search for \"nuclear energy\" within the PDF\n12. Look at the total number of hits",
+            "Number of steps": "12",
+            "How long did this take?": "4 minutes",
+            "Tools": "1. Web browser\n2. Search engine\n3. PDF reader ",
+            "Number of tools": "3"
+        }
+    },
+    {
+        "id": 61,
+        "task_id": "6f37996b-2ac7-44b0-8e68-6d28256631b4",
+        "Question": "Given this table defining * on the set S = {a, b, c, d, e}\n\n|*|a|b|c|d|e|\n|---|---|---|---|---|---|\n|a|a|b|c|b|d|\n|b|b|c|a|e|c|\n|c|c|a|b|b|a|\n|d|b|e|b|e|d|\n|e|d|b|a|d|c|\n\nprovide the subset of S involved in any possible counter-examples that prove * is not commutative. Provide your answer as a comma separated list of the elements in the set in alphabetical order.",
+        "answer": "b, e",
+        "Level": 1,
+        "Annotator_Metadata": {
+            "Steps": "1. Compile the markdown.\n2. Look at the table across the diagonal to see if any portions are not symmetrical.\n3. See that b * e != e * b, but all others are symmetrical.",
+            "Number of steps": "3",
+            "How long did this take?": "5 minutes",
+            "Tools": "1. Markdown",
+            "Number of tools": "1"
+        }
+    },
+    {
+        "id": 62,
+        "task_id": "56db2318-640f-477a-a82f-bc93ad13e882",
+        "Question": "The following numbers function similarly to ISBN 13 numbers, however, their validation methods are slightly different. Rather than using alternate weights of 1 and 3, the checksum digit is calculated with an alternate weight of 1 and some other positive integer less than 10. Otherwise, the checksum digit is calculated as expected. Unfortunately, there is an error in the data. Two adjacent columns have been transposed. These errored columns do not involve the final column or one of the first three columns. Using this information, please provide all potential solutions with the unknown weight and the smaller index of the two errored columns (assume we start our indexing at 0 and ignore hyphens). Give your answer in the form x, y where x is the weight and y is the smaller index of the two transposed columns.\n\n978-354181391-9\n978-946669746-1\n978-398036139-6\n978-447656680-4\n978-279586664-7\n978-595073693-3\n978-976647652-6\n978-591178125-5\n978-728465924-5\n978-414825155-9",
+        "answer": "7, 9",
+        "Level": 3,
+        "Annotator_Metadata": {
+            "Steps": "1. Consider the numbers as if the first potential columns were the ones transposed, which would be smallest index 3 giving solution (n, 3).\n2. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-534181391-9\n(9+7n+8+5n+3+4n+1+8n+1+3n+9+1n) mod 10 ≡ (10 - 9)\nn = 5 is our only possible solution if these are the transposed columns.\n3. \"Fix\" the columns in the second number and see if n = 5 is still a solution:\n978-946669746-1\n978-496669746-1\n(9+7n+8+4n+9+6n+6+6n+9+7n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 5, (9+7n+8+4n+9+6n+6+6n+9+7n+4+6n) mod 10 ≡ 5, so this fails. There is no consistent solution if columns 3 and 4 are transposed.\n4. See if there is a valid solution for (n, 4) or columns 4 and 5 transposed under some weight n.\n5. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-345181391-9\n(9+7n+8+3n+4+5n+1+8n+1+3n+9+1n) mod 10 ≡ (10 - 9)\nn = 7 is our only possible solution if these are the transposed columns.\n6. \"Fix\" the columns in the second number and see if n = 7 is still a solution:\n978-946669746-1\n978-964669746-1\n(9+7n+8+9n+6+4n+6+6n+9+7n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 7, (9+7n+8+9n+6+4n+6+6n+9+7n+4+6n) mod 10 ≡ 5, so this fails. There is no consistent solution if columns 4 and 5 are transposed.\n7. See if there is a valid solution for (n, 5) or columns 5 and 6 transposed under some weight n.\n8. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-351481391-9\n(9+7n+8+3n+5+1n+4+8n+1+3n+9+1n) mod 10 ≡ (10 - 9)\nn = 5 is our only possible solution if these are the transposed columns.\n9. \"Fix\" the columns in the second number and see if n = 5 is still a solution:\n978-946669746-1\n978-946669746-1\n(9+7n+8+9n+4+6n+6+6n+9+7n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 5, (9+7n+8+9n+4+6n+6+6n+9+7n+4+6n) mod 10 ≡ 5, so this fails. There is no consistent solution if columns 5 and 6 are transposed.\n10. See if there is a valid solution for (n, 6) or columns 6 and 7 transposed under some weight n.\n11. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-354811391-9\n(9+7n+8+3n+5+4n+8+1n+1+3n+9+1n) mod 10 ≡ (10 - 9)\nn = 9 is our only possible solution if these are the transposed columns.\n12. \"Fix\" the columns in the second number and see if n = 9 is still a solution:\n978-946669746-1\n978-946669746-1\n(9+7n+8+9n+4+6n+6+6n+9+7n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 9, (9+7n+8+9n+4+6n+6+6n+9+7n+4+6n) mod 10 ≡ 9, so this solution holds for the second number.\n13. \"Fix\" the columns in the third number and see if n = 9 is still a solution:\n978-398036139-6\n978-398306139-6\n(9+7n+8+3n+9+8n+3+0n+6+1n+3+9n) mod 10 ≡ (10 - 6)\nWhen n = 9, (9+7n+8+3n+9+8n+3+0n+6+1n+3+9n) mod 10 ≡ 0, so this fails. There is no consistent solution if columns 6 and 7 are transposed.\n14. See if there is a valid solution for (n, 7) or columns 7 and 8 transposed under some weight n.\n15. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-354118391-9\n(9+7n+8+3n+5+4n+1+1n+8+3n+9+1n) mod 10 ≡ (10 - 9)\nn = 9 is our only possible solution if these are the transposed columns.\n16. \"Fix\" the columns in the second number and see if n = 9 is still a solution:\n978-946669746-1\n978-946696746-1\n(9+7n+8+9n+4+6n+6+9n+6+7n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 9, (9+7n+8+9n+4+6n+6+9n+6+7n+4+6n) mod 10 ≡ 3, so this fails. There is no consistent solution if columns 7 and 8 are transposed.\n17. See if there is a valid solution for (n, 8) or columns 8 and 9 transposed under some weight n.\n18. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-354183191-9\n(9+7n+8+3n+5+4n+1+8n+3+1n+9+1n) mod 10 ≡ (10 - 9)\nn = 4 and n = 9 are both possible solutions to this modular equation.\n19. \"Fix\" the columns in the second number and see if n = 4 and n = 9 are still solutions:\n978-946669746-1\n978-946667946-1\n(9+7n+8+9n+4+6n+6+6n+7+9n+4+6n) mod 10 ≡ (10 - 1)\nWhen n = 4, (9+7n+8+9n+4+6n+6+6n+7+9n+4+6n) mod 10 ≡ 0. When n = 9, (9+7n+8+9n+4+6n+6+6n+7+9n+4+6n) mod 10 ≡ 5. As neither solution found works for the second number, this fails. There is no consistent solution if columns 8 and 9 are transposed.\n20. See if there is a valid solution for (n, 9) or columns 9 and 10 transposed under some weight n.\n21. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-354181931-9\n(9+7n+8+3n+5+4n+1+8n+1+9n+3+1n) mod 10 ≡ (10 - 9)\nn = 2 and n = 7 are both possible solutions to this modular equation.\n22. \"Fix\" the columns in the second number and see if n = 2 and n = 7 are still solutions:\n978-946667946-1\n978-946667496-1\n(9+7n+8+9n+4+6n+6+6n+7+4n+9+6n) mod 10 ≡ (10 - 1)\nWhen n = 2, (9+7n+8+9n+4+6n+6+6n+7+4n+9+6n) mod 10 ≡ 9 and when n = 7 (9+7n+8+9n+4+6n+6+6n+7+4n+9+6n) mod 10 ≡ 9, so both n = 2 and n = 7 remain consistent.\n23. \"Fix\" the columns in the third number and see if n = 2 and n = 7 are still solutions:\n978-398036139-6\n978-398036319-6\n(9+7n+8+3n+9+8n+0+3n+6+3n+1+9n) mod 10 ≡ (10 - 6)\nWhen n = 2, (9+7n+8+3n+9+8n+0+3n+6+3n+1+9n) mod 10 ≡ 9, so n cannot be 2. When n = 7, (9+7n+8+3n+9+8n+0+3n+6+3n+1+9n) mod 10 ≡ 4, so this solution is still consistent.\n24. \"Fix\" the columns in the fourth number and see if n = 7 is still a solution:\n978-447656680-4\n978-447656860-4\nWhen n = 7, (9+7n+8+4n+4+7n+6+5n+6+8n+6+0n) mod 10 ≡ (10 - 4)\n(9+7n+8+4n+4+7n+6+5n+6+8n+6+0n) mod 10 ≡ 6, so n = 7 is still a potential solution.\n24. \"Fix\" the columns in the fifth number and see if n = 7 is still a solution:\n978-279586664-7\n978-279586664-7\n(9+7n+8+2n+7+9n+5+8n+6+6n+6+4n) mod 10 ≡ (10 - 7)\nWhen n = 7, (9+7n+8+2n+7+9n+5+8n+6+6n+6+4n) mod 10 ≡ 3, so n = 7 is still a potential solution.\n24. \"Fix\" the columns in the sixth number and see if n = 7 is still a solution:\n978-595073693-3\n978-595073963-3\n(9+7n+8+5n+9+5n+0+7n+3+9n+6+3n) mod 10 ≡ (10 - 3)\nWhen n = 7, (9+7n+8+5n+9+5n+0+7n+3+9n+6+3n) mod 10 ≡ 7, so n = 7 is still a potential solution.\n25. \"Fix\" the columns in the seventh number and see if n = 7 is still a solution:\n978-976647652-6\n978-976647562-6\n(9+7n+8+9n+7+6n+6+4n+7+5n+6+2n) mod 10 ≡ (10 - 6)\nWhen n = 7, (9+7n+8+9n+7+6n+6+4n+7+5n+6+2n) mod 10 ≡ 4, so n = 7 is still a potential solution.\n26. \"Fix\" the columns in the eighth number and see if n = 7 is still a solution:\n978-591178125-5\n978-591178215-5\n(9+7n+8+5n+9+1n+1+7n+8+2n+1+5n) mod 10 ≡ (10 - 5)\nWhen n = 7, (9+7n+8+5n+9+1n+1+7n+8+2n+1+5n) mod 10 ≡ 5, so n = 7 is still a potential solution.\n27. \"Fix\" the columns in the ninth number and see if n = 7 is still a solution:\n978-728465924-5\n978-728465294-5\n(9+7n+8+7n+2+8n+4+6n+5+2n+9+4n) mod 10 ≡ (10 - 5)\nWhen n = 7, (9+7n+8+7n+2+8n+4+6n+5+2n+9+4n) mod 10 ≡ 5, so n = 7 is still a potential solution.\n28. \"Fix\" the columns in the final number and see if n = 7 is still a solution:\n978-414825155-9\n978-414825515-9\n(9+7n+8+4n+1+4n+8+2n+5+5n+1+5n) mod 10 ≡ (10 - 9)\nWhen n = 7, (9+7n+8+4n+1+4n+8+2n+5+5n+1+5n) mod 10 ≡ 1, so n = 7 is a consistent solution for all the numbers given. This means that (7, 9) is a solution to the problem.\n29. As the problem asks for all possible solutions, we need to check to see if there is a valid solution for (n, 10) or columns 10 and 11 transposed under some weight n even though we found a solution already. It is possible the solution we found is not unique.\n30. \"Fix\" the columns in the first number and see if any n from 1-9 can generate the proper check digit. Calculations:\n978-354181391-9\n978-354181319-9\n(9+7n+8+3n+5+4n+1+8n+1+3n+1+9n) mod 10 ≡ (10 - 9)\nn = 4 and n = 9 are both possible solutions to this modular equation.\n31. \"Fix\" the columns in the second number and see if n = 4 and n = 9 are still solutions:\n978-946669746-1\n978-946669764-1\n(9+7n+8+9n+4+6n+6+6n+9+7n+6+4n) mod 10 ≡ (10 - 1)\nWhen n = 4, (9+7n+8+9n+4+6n+6+6n+9+7n+6+4n) mod 10 ≡ 8, so n cannot be 4. When n = 9, (9+7n+8+9n+4+6n+6+6n+9+7n+6+4n) mod 10 ≡ 3, so n cannot be 9. As neither solution found works for the second number, this fails. There is no consistent solution if columns 10 and 11 are transposed.\n32. We checked all possible forms of the error and found only one potential solution, (7, 9) so this is our only answer.",
+            "Number of steps": "32",
+            "How long did this take?": "60 minutes",
+            "Tools": "1. a calculator",
+            "Number of tools": "1"
+        }
+    },
+    {
         "id": 67,
         "task_id": "71345b0a-9c7d-4b50-b2bf-937ec5879845",
         "Question": "On a leap day before the year 2008, a joke was removed from the Wikipedia page for “Dragon”. What was the phrase that was removed? Give the phrase as it appeared on the page, but without punctuation.",
@@ -797,5 +1441,4 @@
             "Number of tools": "2"
         }
     }
-
 ]
