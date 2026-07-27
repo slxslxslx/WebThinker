@@ -93,7 +93,7 @@ async def llm_evaluate_equivalence_single(
     """Evaluate a single pair of answers using LLM"""
     print(f"开始执行llm_evaluate_equivalence_single ")
 
-    if extract_answer:  # 评估 Prompt
+    if extract_answer:  # 评估 Prompt。  用于评估已经被“清洗/抽取”过的、简短的预测答案。这个答案通常来自一个前置的自动化处理步骤（例如，从长输出中解析出 \boxed{}），已经是一个结构化的片段。
         prompt = f"""You are an evaluation assistant. Please determine if the predicted answer is equivalent to the labeled answer.
 
 Question: {question}
@@ -104,7 +104,7 @@ Predicted Answer: {pred_answer}
 
 Are these answers equivalent? Please respond with "Correct" if they are equivalent, or "Incorrect" if they are not equivalent. Do not include any other text.
 """
-    else:
+    else:  # 用于评估原始的、未处理的模型输出片段。这通常是模型输出的最后几行，可能包含思考过程、解释或格式标记，相对“脏”一些。
         prompt = f"""You are an evaluation assistant. Please determine if the model output is equivalent to the labeled answer.
 
 Question: {question}
@@ -140,8 +140,8 @@ Did the model give an answer equivalent to the labeled answer? Please respond wi
                     "correct" in resp_low and
                     not ("incorrect" in resp_low or "wrong" in resp_low or "not correct" in resp_low)
                 )
-                print(f" llm_evaluate_equivalence_single 的  response_text={response_text}")
-                print(f" llm_evaluate_equivalence_single 的  llm_judge={llm_judge}")
+                print(f" llm_evaluate_equivalence_single 的  response_text={response_text}")  # correct Incorrect
+                print(f" llm_evaluate_equivalence_single 的  llm_judge={llm_judge}")  # true false
                 return llm_judge, response_text
         except Exception as e:
             if attempt == retry_limit - 1:
