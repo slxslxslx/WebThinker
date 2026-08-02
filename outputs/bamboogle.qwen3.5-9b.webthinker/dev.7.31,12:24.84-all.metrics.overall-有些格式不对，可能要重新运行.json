@@ -1,0 +1,18 @@
+{
+    "em": 0.608,
+    "acc": 0.696,
+    "f1": 0.7067265169420844,
+    "math_equal": 0.616,
+    "num_valid_answer": "112 of 125",
+    "llm_equal": 0.752,
+    "domain_metrics": {
+        "Unknown": {
+            "total": 125,
+            "em": 0.608,
+            "acc": 0.696,
+            "f1": 0.7067265169420844,
+            "math_equal": 0.616,
+            "llm_equal": 0.752
+        }
+    }
+}
