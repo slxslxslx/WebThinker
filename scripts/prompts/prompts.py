@@ -24,7 +24,29 @@ Remember:
 """
 
 
+def get_gpqa_web_thinker_instruction_zh(MAX_SEARCH_LIMIT=15):
+    return """你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：
 
+- 进行搜索时：请写 <|begin_search_query|>你的查询内容<|end_search_query|>。
+然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。
+
+如有必要，你可以多次重复搜索过程。一旦获得了所需的全部信息，请继续进行推理。
+
+示例：
+问题："pp III 中微子的能量范围是多少？"
+思考步骤：
+- 我可能需要查阅关于 pp III 中微子的详细信息。
+
+<|begin_search_query|>pp III neutrino energy spectrum<|end_search_query|>
+
+（系统返回来自相关网页的处理后信息）
+
+使用新信息继续推理...
+
+请记住：
+- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。
+- 搜索完成后，继续你的推理。
+"""
 
 
 def get_deep_web_explorer_instruction(search_query, search_intent, search_result):
@@ -64,22 +86,23 @@ def get_deep_web_explorer_instruction(search_query, search_intent, search_result
 Now please analyze the web pages and extract relevant information for the search query "{search_query}" and the search intent.
 """
 
+
 def get_deep_web_explorer_instruction_zh(search_query, search_intent, search_result):
-    return f"""你是一位网络探索者，负责根据给定的搜索查询和搜索意图，分析搜索结果以找到相关信息。
+    return f"""你是一个网络探索者，负责分析搜索结果，根据给定的搜索查询和搜索意图找出相关信息。
 
 **指南：**
 
-1. **分析已搜索的网页：**
-   - 仔细阅读每个已搜索网页的内容。
-   - 找出与**当前搜索查询**相关且有助于对原始问题进行推理的事实信息。
+1. **分析搜索到的网页：**
+- 仔细审阅每个搜索网页的内容。
+- 识别与**当前搜索查询**相关、且有助于原问题推理过程的事实信息。
 
-2. **进一步获取信息：**
-   - 如果信息与查询不相关，你可以：
-     1. 重新搜索：<|begin_search_query|>另一个搜索查询<|end_search_query|>
-     2. 使用以下方式访问网页内容：<|begin_click_link|>你的URL<|end_click_link|>
+2. **寻求更多信息：**
+- 如果信息与查询不相关，你可以：
+  1. 重新搜索：<|begin_search_query|>另一个搜索查询<|end_search_query|>
+  2. 使用以下方式访问网页内容：<|begin_click_link|>你的URL<|end_click_link|>
 
 3. **提取相关信息：**
-   - 从**已搜索的网页**中返回与**当前搜索查询**相关的信息。
+- 从**搜索到的网页**中返回与**当前搜索查询**相关的信息。
 
 4. **输出格式：**
    - 按如下所示，以 **最终信息** 开头呈现信息。
@@ -95,10 +118,10 @@ def get_deep_web_explorer_instruction_zh(search_query, search_intent, search_res
 - **详细搜索意图：**
 {search_intent}
 
-- **已搜索的网页：**
+- **搜索到的网页：**
 {search_result}
 
-现在请分析网页，并针对搜索查询“{search_query}”和搜索意图提取相关信息。
+现在请分析这些网页，并为搜索查询 "{search_query}" 以及搜索意图提取相关信息。
 """
 
 
@@ -107,6 +130,12 @@ def get_web_page_reader_instruction(query, document):
     return f"""{document}
 Please provide all content related to "{query}" from this document in markdown format.
 If there isn't any relevant information, just output "No relevant information". If there is any relevant information, output all the relevant information with potential helpful links."""
+
+def get_web_page_reader_instruction_zh(query, document):
+    return f"""{document}
+请以 markdown 格式提供该文档中所有与 "{query}" 相关的内容。
+如果没有任何相关信息，只需输出 "No relevant information"。如果有任何相关信息，请输出全部相关信息，并附上可能有用的链接。"""
+
 
 def get_detailed_web_page_reader_instruction(query, search_intent, document):
     return f"""Please provide all content related to the following search query and search intent from this document in markdown format.
@@ -127,12 +156,36 @@ Instructions:
 - Focus on factual, accurate information that directly addresses the query/intent
 """
 
+def get_detailed_web_page_reader_instruction_zh(query, search_intent, document):
+    return f"""请以 markdown 格式提供该文档中与以下搜索查询和搜索意图相关的所有内容。
+
+搜索查询： 
+{query}
+
+搜索意图： 
+{search_intent}
+
+搜索到的网页：
+{document}
+
+说明：
+- 提取所有符合搜索查询和意图的内容，不要遗漏任何相关信息。
+- 包含来源中的任何相关链接
+- 如果没有相关信息，输出 "No relevant information"
+- 重点关注直接针对查询/意图的事实性、准确信息
+"""
+
 
 # 页面阅读摘要
 def get_search_intent_instruction(prev_reasoning):
     return f"""Based on the previous thoughts below, provide the detailed intent of the latest search query.
 Previous thoughts: {prev_reasoning}
 Please provide the current search intent."""
+
+def get_search_intent_instruction_zh(prev_reasoning):
+    return f"""根据以下之前的思考内容，提供最新搜索查询的详细意图。
+之前的思考： {prev_reasoning}
+请提供当前的搜索意图。"""
 
 
 # 点击意图
@@ -141,6 +194,11 @@ def get_click_intent_instruction(prev_reasoning):
 Previous thoughts: {prev_reasoning}
 Please provide the current click intent."""
 
+# 点击意图
+def get_click_intent_instruction_zh(prev_reasoning):
+    return f"""根据以下之前的思考内容，提供最新点击操作的详细意图。
+之前的思考： {prev_reasoning}
+请提供当前的点击意图。"""
 
 
 def get_query_plan_instruction(question):
@@ -163,6 +221,24 @@ Output your query plan in JSON format as follows:
 ```
 """
 
+def get_query_plan_instruction_zh(question):
+    return f"""你是一个推理助手。你的任务是通过将用户问题分解为子查询，生成详细的查询计划以回答该问题。
+
+问题： {question}
+
+请分析该问题，并将其分解为多个子查询，这些子查询将帮助收集回答问题所需的全部必要信息。
+
+请按以下 JSON 格式输出你的查询计划：
+
+```json
+{{
+    "query_plan": [
+        "sub-query-1",
+        "sub-query-2",
+        ...
+    ]
+}}
+"""
 
 
 
@@ -192,6 +268,26 @@ def get_gpqa_search_o1_instruction(MAX_SEARCH_LIMIT):
         "- When done searching, continue your reasoning.\n\n"
     )
 
+def get_gpqa_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        f"如有必要，你可以多次重复搜索过程。搜索尝试的最大次数限制为 {MAX_SEARCH_LIMIT}。\n\n"
+        "一旦获得了所需的全部信息，请继续进行推理。\n\n"
+        "示例：\n"
+        "问题：\"pp III 中微子的能量范围是多少？\"\n"
+        "助手思考步骤：\n"
+        "- 我可能需要查阅关于 pp III 中微子的详细信息。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>pp III neutrino energy spectrum<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n\n"
+    )
+
 
 def get_math_search_o1_instruction(MAX_SEARCH_LIMIT):
     return (
@@ -214,6 +310,26 @@ def get_math_search_o1_instruction(MAX_SEARCH_LIMIT):
         "- When done searching, continue your reasoning.\n\n"
     )
 
+def get_math_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        f"如有必要，你可以多次重复搜索过程。搜索尝试的最大次数限制为 {MAX_SEARCH_LIMIT}。\n\n"
+        "一旦获得了所需的全部信息，请继续进行推理。\n\n"
+        "示例：\n"
+        "问题：\"如何计算 e^(x^2) 的积分？\"\n"
+        "助手思考步骤：\n"
+        "- 我可能需要查阅积分 e^(x^2) 的方法。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>methods to integrate e^(x^2)<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n\n"
+    )
+
 
 def get_code_search_o1_instruction(MAX_SEARCH_LIMIT):
     return (
@@ -234,6 +350,26 @@ def get_code_search_o1_instruction(MAX_SEARCH_LIMIT):
         "Remember:\n"
         "- Use <|begin_search_query|> to request a web search and end with <|end_search_query|>.\n"
         "- When done searching, continue your reasoning.\n\n"
+    )
+
+def get_code_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        f"如有必要，你可以多次重复搜索过程。搜索尝试的最大次数限制为 {MAX_SEARCH_LIMIT}。\n\n"
+        "一旦获得了所需的全部信息，请继续进行推理。\n\n"
+        "示例：\n"
+        "问题：\"在给定树中，找到包含所有指定顶点的 Steiner 树的最小顶点数。\"\n"
+        "助手思考步骤：\n"
+        "- 我需要理解什么是 Steiner 树，以及如何计算在给定树中包含所有指定顶点所需的最小顶点数。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>Minimum Steiner Tree problem in trees<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n\n"
     )
 
 
@@ -277,6 +413,46 @@ No helpful information found.
 Now you should analyze each web page and find helpful information based on the current search query "{search_query}" and previous reasoning steps.
 """
 
+def get_webpage_to_reasonchain_instruction_zh(prev_reasoning, search_query, document):
+    return f"""**任务说明：**
+
+你需要根据以下输入阅读并分析网页：**之前的推理步骤**、**当前搜索查询** 和 **搜索到的网页**。你的目标是从 **搜索到的网页** 中提取对 **当前搜索查询** 有用且相关的信息，并将这些信息无缝整合到 **之前的推理步骤** 中，以继续对原问题进行推理。
+
+**指南：**
+
+1. **分析搜索到的网页：**
+- 仔细审阅每个搜索网页的内容。
+- 识别与 **当前搜索查询** 相关、且有助于原问题推理过程的事实信息。
+
+2. **提取相关信息：**
+- 从搜索到的网页中选择直接有助于推进 **之前的推理步骤** 的信息。
+- 确保提取的信息准确且相关。
+
+3. **输出格式：**
+- **如果网页为当前搜索查询提供了有用信息：** 以 `**最终信息**` 开头呈现信息，如下所示。
+**最终信息**
+
+[有用信息]
+
+- **如果网页没有为当前搜索查询提供任何有用信息：** 输出以下文本。
+
+**最终信息**
+
+No helpful information found.
+
+**输入：**
+- **之前的推理步骤：**  
+{prev_reasoning}
+
+- **当前搜索查询：**  
+{search_query}
+
+- **搜索到的网页：**  
+{document}
+
+现在你应该分析每个网页，并根据当前搜索查询 "{search_query}" 以及之前的推理步骤找出有用信息。
+"""
+
 
 def get_singleqa_search_o1_instruction(MAX_SEARCH_LIMIT):
     return (
@@ -298,6 +474,27 @@ def get_singleqa_search_o1_instruction(MAX_SEARCH_LIMIT):
         "- Use <|begin_search_query|> to request a web search and end with <|end_search_query|>.\n"
         "- When done searching, continue your reasoning.\n\n"
     )
+
+def get_singleqa_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        f"如有必要，你可以多次重复搜索过程。搜索尝试的最大次数限制为 {MAX_SEARCH_LIMIT}。\n\n"
+        "一旦获得了所需的全部信息，请继续进行推理。\n\n"
+        "示例：\n"
+        "问题：\"谁获得了第一届诺贝尔物理学奖？\"\n"
+        "助手思考步骤：\n"
+        "- 我需要找出谁获得了第一届诺贝尔物理学奖。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>first Nobel Prize in Physics winner<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n\n"
+    )
+
 
 def get_multiqa_search_o1_instruction(MAX_SEARCH_LIMIT):
     return (
@@ -325,6 +522,32 @@ def get_multiqa_search_o1_instruction(MAX_SEARCH_LIMIT):
         "- When done searching, continue your reasoning.\n\n"
     )
 
+def get_multiqa_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你准确回答用户的问题。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        f"如有必要，你可以多次重复搜索过程。搜索尝试的最大次数限制为 {MAX_SEARCH_LIMIT}。\n\n"
+        "一旦获得了所需的全部信息，请继续进行推理。\n\n"
+        "示例：\n"
+        "问题：\"Alice David 是哪家公司开发的视频游戏中 Lara Croft 的配音演员？\"\n"
+        "助手思考步骤：\n"
+        "- 我需要找出谁为视频游戏中的 Lara Croft 配音。\n"
+        "- 然后，我需要确定是哪家公司开发了那款视频游戏。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>Alice David Lara Croft voice<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手思考：搜索结果表明 Alice David 是某款特定视频游戏中 Lara Croft 的配音。现在我需要找出是哪家公司开发了那款游戏。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>video game developed by Alice David Lara Croft<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n\n"
+    )
+
+
 def get_timeline_search_o1_instruction(MAX_SEARCH_LIMIT):
     return (
         "You are a reasoning assistant with the ability to perform web searches to help "
@@ -347,6 +570,26 @@ def get_timeline_search_o1_instruction(MAX_SEARCH_LIMIT):
         "- You should perform as many searches as possible to gather comprehensive information.\n\n"
     )
 
+def get_timeline_search_o1_instruction_zh(MAX_SEARCH_LIMIT):
+    return (
+        "你是一个具备网络搜索能力的推理助手，可以帮助你创建准确的时间线摘要。你拥有以下特殊工具：\n\n"
+        "- 进行搜索时：请写 <|begin_search_query|> 你的查询内容 <|end_search_query|>。\n"
+        "然后系统会搜索并分析相关网页，随后以 <|begin_search_result|> ...搜索结果... <|end_search_result|> 的格式向你提供有用信息。\n\n"
+        "你应该进行多次搜索以收集全面信息，直到你认为已经掌握足够细节。\n"
+        "最后，提供一个包含所有相关事件并按时间顺序排列的完整时间线。\n\n"
+        "示例：\n"
+        "文本：\"创建阿波罗 11 号任务关键事件的时间线。\"\n"
+        "助手思考步骤：\n"
+        "- 我需要找出阿波罗 11 号任务的关键日期和事件。\n\n"
+        "助手：\n"
+        "<|begin_search_query|>Apollo 11 mission timeline key events dates<|end_search_query|>\n\n"
+        "（系统返回来自相关网页的处理后信息）\n\n"
+        "助手使用新信息继续推理...\n\n"
+        "请记住：\n"
+        "- 使用 <|begin_search_query|> 发起网络搜索，并以 <|end_search_query|> 结束。\n"
+        "- 搜索完成后，继续你的推理。\n"
+        "- 你应该尽可能多地进行搜索，以收集全面信息。\n\n"
+    )
 
 
 def get_naive_rag_instruction(question, documents):
@@ -358,6 +601,14 @@ def get_naive_rag_instruction(question, documents):
         f"{documents}\n"
     )
 
+def get_naive_rag_instruction_zh(question, documents):
+    return (
+        "你是一个知识渊博的助手，使用提供的文档来回答用户的问题。\n\n"
+        "问题：\n"
+        f"{question}\n"
+        "文档：\n"
+        f"{documents}\n"
+    )
 
 
 def get_task_instruction_openqa(question, model_name=None):
@@ -381,6 +632,27 @@ def get_task_instruction_openqa(question, model_name=None):
         )
     return user_prompt
 
+def get_task_instruction_openqa_zh(question, model_name=None):
+    if model_name == 'qwq':
+        user_prompt = (
+            '请回答以下问题。'
+            '你应该以 \\boxed{YOUR_ANSWER} 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    elif model_name == 'dpsk':
+        user_prompt = (
+            '请回答以下问题。\n\n'
+            '请以 **ANSWER: {YOUR_ANSWER}** 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    else:
+        user_prompt = (
+            '请回答以下问题。你应该一步一步思考来解决它。\n\n'
+            '请以 \\boxed{YOUR_ANSWER} 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    return user_prompt
+
 def get_task_instruction_math(question, model_name=None):
     if model_name == 'qwq':
         user_prompt = (
@@ -399,6 +671,27 @@ def get_task_instruction_math(question, model_name=None):
             'Please answer the following math question. You should think step by step to solve it.\n\n'
             'Provide your final answer in the format \\boxed{YOUR_ANSWER}.\n\n'
             f'Question:\n{question}\n\n'
+        )
+    return user_prompt
+
+def get_task_instruction_math_zh(question, model_name=None):
+    if model_name == 'qwq':
+        user_prompt = (
+            '请回答以下数学问题。'
+            '你应该以 \\boxed{YOUR_ANSWER} 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    elif model_name == 'dpsk':
+        user_prompt = (
+            '请回答以下数学问题。\n\n'
+            '请以 **ANSWER: YOUR_ANSWER** 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    else:
+        user_prompt = (
+            '请回答以下数学问题。你应该一步一步思考来解决它。\n\n'
+            '请以 \\boxed{YOUR_ANSWER} 的格式提供最终答案。\n\n'
+            f'问题：\n{question}\n\n'
         )
     return user_prompt
 
@@ -429,6 +722,33 @@ def get_task_instruction_multi_choice(question, model_name=None):
         )
     return user_prompt
 
+def get_task_instruction_multi_choice_zh(question, model_name=None):
+    if model_name == 'qwq':
+        user_prompt = (
+            '请回答以下选择题。'
+            '你应该以 \\boxed{YOUR_CHOICE} 的格式提供最终选择。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    elif model_name == 'dpsk':
+        user_prompt = (
+            '请回答以下选择题。\n\n'
+            '请以 **ANSWER: {YOUR_CHOICE}** 的格式提供最终选择。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    elif model_name == 'llama':
+        user_prompt = (
+            '请回答以下选择题。你应该一步一步思考来解决它。\n\n'
+            '请以 \\boxed{YOUR_CHOICE} 的格式提供最终选择。你的最终选择应该是字母 A、B、C 或 D 中的一个，不要包含任何答案内容。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    else:
+        user_prompt = (
+            '请回答以下选择题。你应该一步一步思考来解决它。\n\n'
+            '请以 \\boxed{YOUR_CHOICE} 的格式提供最终选择。\n\n'
+            f'问题：\n{question}\n\n'
+        )
+    return user_prompt
+
 def get_task_instruction_code(question, question_title=None, model_name=None):
     if model_name == 'qwq':
         user_prompt = (
@@ -447,6 +767,26 @@ def get_task_instruction_code(question, question_title=None, model_name=None):
             "```python\n# YOUR CODE HERE\n```\n\n"
         )
     return user_prompt
+
+def get_task_instruction_code_zh(question, question_title=None, model_name=None):
+    if model_name == 'qwq':
+        user_prompt = (
+            '生成一个正确的 Python 程序，使其通过给定问题的所有测试。'
+            '你应该在使用三重反引号的 Python 代码块中提供最终代码（```python\n'
+            'YOUR_CODE\n'
+            '```）。\n\n'
+            f'问题标题：{question_title}\n\n'
+            f'问题陈述：\n{question}\n\n'
+        )
+    else:
+        user_prompt = (
+            '你将收到一个问题（问题规范），并生成一个符合规范且通过所有测试的正确 Python 程序。'
+            f'你应该一步一步思考来解决它。\n\n问题：\n{question}\n\n'
+            '从标准输入读取输入，解决问题并将答案写入标准输出（不要直接在样本输入上测试）。将你的代码用以下分隔符括起来。\n\n'
+            "```python\n# YOUR CODE HERE\n```\n\n"
+        )
+    return user_prompt
+
 
 def get_task_instruction_timeline(text, model_name=None):
     # Common format template for both cases
@@ -468,3 +808,22 @@ def get_task_instruction_timeline(text, model_name=None):
             f'{base_prompt}'
         )
 
+def get_task_instruction_timeline_zh(text, model_name=None):
+    # Common format template for both cases
+    format_template = '- [日期/时间]：事件描述\n\n'
+    # Base prompt that's shared between both cases
+    base_prompt = f'文本：\n{text}\n\n'
+    if model_name == 'qwq':
+        return (
+            '现在是 2025 年 3 月 14 日。请根据给定文本创建一个全面的时间线。'
+            f'将每个事件格式化为：\n{format_template}'
+            '确保事件按时间顺序排列，并在可用时包含具体日期/时间。\n\n'
+            f'{base_prompt}'
+        )
+    else:
+        return (
+            '请按时间顺序总结文本中的关键事件。'
+            '对于每个事件，包含日期/时间（如果有）和清晰的描述。\n\n'
+            f'将你的时间线格式化为：\n{format_template}'
+            f'{base_prompt}'
+        )
