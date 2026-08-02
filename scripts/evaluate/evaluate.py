@@ -143,11 +143,10 @@ Did the model give an answer equivalent to the labeled answer? Please respond wi
                 resp_low = response_text.lower()
                 print(f"llm_evaluate_equivalence_single里面的 resp_low={resp_low}")
                 llm_judge = is_equiv(pred_answer, labeled_answer) or (
-                    "correct" in resp_low and
-                    not ("incorrect" in resp_low or "wrong" in resp_low or "not correct" in resp_low)
+                    "correct" in resp_low and not ("incorrect" in resp_low or "wrong" in resp_low or "not correct" in resp_low)
                 )
-                print(f" llm_evaluate_equivalence_single 的  response_text={response_text}")  # correct Incorrect
-                print(f" llm_evaluate_equivalence_single 的  llm_judge={llm_judge}")  # true false
+                print(f" llm_evaluate_equivalence_single 的 response_text={response_text}")  # correct Incorrect
+                print(f" llm_evaluate_equivalence_single 的 llm_judge={llm_judge}")  # true false
                 return llm_judge, response_text
         except Exception as e:
             if attempt == retry_limit - 1:
@@ -223,7 +222,8 @@ async def llm_evaluate_equivalence_batch(
 
 # 计算 EM/Acc/F1/Math 等指标
 def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, question=None, extract_answer=False):
-    final_metric = {"is_valid_answer": False, "acc": 0, "em": 0, "f1": 0, 'math_equal': 0, 'llm_equal': 0} # 2. 初始化指标字典
+    # 修改：增加 precision 和 recall 的初始化
+    final_metric = {"is_valid_answer": False, "acc": 0, "em": 0, "precision": 0, "recall": 0, "f1": 0, 'math_equal': 0, 'llm_equal': 0} # 2. 初始化指标字典
     pred_answer = extract_answer_fn(output, mode=mode, extract_answer=extract_answer)  # 调用 extract_answer_fn() 提取 Pred_Answer
     pred_answer_new = pred_answer
     if pred_answer != '':  # 判断答案是否有效
@@ -282,6 +282,8 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
         num_same = sum(common.values())
         if num_same == 0:
             f1 = 0
+            precision = 0
+            recall = 0
         else:
             precision = 1.0 * num_same / len(prediction_tokens) if len(prediction_tokens) > 0 else 0
             recall = 1.0 * num_same / len(ground_truth_tokens) if len(ground_truth_tokens) > 0 else 0
@@ -292,6 +294,9 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
 
         final_metric["em"] = em
         final_metric["acc"] = acc
+        # 修改：增加 precision 和 recall 的赋值
+        final_metric["precision"] = precision
+        final_metric["recall"] = recall
         final_metric["f1"] = f1
 
         final_metric["math_equal"] = is_equiv(normalized_pred_answer, normalized_ground_truth)
@@ -312,12 +317,14 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
     print(f"evaluate.py开始运行 run_evaluation, input_list={input_list}")
     print(f"evaluate.py开始运行 run_evaluation, output_list={output_list}")
     print(f"evaluate.py开始运行 run_evaluation, filtered_data={task_type}")
-
+    # 修改：domain_metrics 中增加 precision 和 recall
     domain_metrics = defaultdict(lambda: {
         'total': 0,
         'correct': 0,
         'em': [],
         'acc': [],
+        'precision': [],
+        'recall': [],
         'f1': [],
         'math_equal': [],
         'llm_equal': [],
@@ -407,9 +414,9 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
 
     elif task_type in ['math', 'choose', 'qa']:
         # Evaluation for math/qa tasks
-        avg_em, avg_acc, avg_f1, avg_math, avg_llm = [], [], [], [], []
+        # 修改：增加 avg_precision, avg_recall
+        avg_em, avg_acc, avg_precision, avg_recall, avg_f1, avg_math, avg_llm = [], [], [], [], [], [], []
         num_valid_answer = 0
-        
         # Lists to store data for batch LLM evaluation
         questions_for_llm = []
         labeled_answers_for_llm = []
@@ -425,15 +432,20 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
             if item['Output'] == '':
                 item['Pred_Answer'] = ''
                 item['Question'] = input_prompt
+                # 修改：增加 precision 和 recall 的默认值
                 item['Metrics'] = {
                     'em': 0,
                     'acc': 0,
+                    'precision': 0,
+                    'recall': 0,
                     'f1': 0,
                     'math_equal': 0,
                     'llm_equal': 0 if use_llm else None
                 }
                 avg_em.append(0)
                 avg_acc.append(0)
+                avg_precision.append(0)
+                avg_recall.append(0)
                 avg_f1.append(0)
                 avg_math.append(0)
                 if use_llm:
@@ -473,6 +485,9 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
 
             avg_em.append(metric['em'])
             avg_acc.append(metric['acc'])
+            # 修改：增加 precision 和 recall 的统计
+            avg_precision.append(metric['precision'])
+            avg_recall.append(metric['recall'])
             avg_f1.append(metric['f1'])
             avg_math.append(metric['math_equal'])
 
@@ -498,9 +513,12 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
                 avg_llm.append(int(llm_result))
 
         # Compute overall metrics
+        # 修改：增加 precision 和 recall 的平均值计算
         overall_metrics = {
             'em': np.mean(avg_em) if len(avg_em) > 0 else 0.0,
             'acc': np.mean(avg_acc) if len(avg_acc) > 0 else 0.0,
+            'precision': np.mean(avg_precision) if len(avg_precision) > 0 else 0.0,
+            'recall': np.mean(avg_recall) if len(avg_recall) > 0 else 0.0,
             'f1': np.mean(avg_f1) if len(avg_f1) > 0 else 0.0,
             'math_equal': np.mean(avg_math) if len(avg_math) > 0 else 0.0,
             'num_valid_answer': f'{num_valid_answer} of {len(input_list)}',
@@ -515,6 +533,9 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
             domain_metrics[domain]['total'] += 1
             domain_metrics[domain]['em'].append(metric['em'])
             domain_metrics[domain]['acc'].append(metric['acc'])
+            # 修改：增加领域指标的 precision 和 recall
+            domain_metrics[domain]['precision'].append(metric['precision'])
+            domain_metrics[domain]['recall'].append(metric['recall'])
             domain_metrics[domain]['f1'].append(metric['f1'])
             domain_metrics[domain]['math_equal'].append(metric['math_equal'])
             if 'llm_equal' in metric:
@@ -528,6 +549,9 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
             'total': metrics['total'],
             'em': np.mean(metrics['em']) if len(metrics['em']) > 0 else 0.0,
             'acc': np.mean(metrics['acc']) if len(metrics['acc']) > 0 else 0.0,
+            # 修改：增加领域指标的 precision 和 recall 的最终计算
+            'precision': np.mean(metrics['precision']) if len(metrics['precision']) > 0 else 0.0,
+            'recall': np.mean(metrics['recall']) if len(metrics['recall']) > 0 else 0.0,
             'f1': np.mean(metrics['f1']) if len(metrics['f1']) > 0 else 0.0,
             'math_equal': np.mean(metrics['math_equal']) if len(metrics['math_equal']) > 0 else 0.0,
         }
