@@ -1,4 +1,3 @@
-# 新的评估脚本，或者说是wenthinker风格的
 import re
 import json
 import numpy as np
@@ -14,10 +13,6 @@ from math_equivalence import is_equiv
 from openai import OpenAI, AsyncOpenAI
 import asyncio
 from typing import List
-# 新增：加载 .env 并导入 httpx
-from dotenv import load_dotenv
-load_dotenv()                     # 读取项目根目录（或脚本所在目录）的 .env 文件
-import httpx
 
 
 # 从原始输出中"抽提"答案
@@ -60,7 +55,7 @@ def extract_answer_fn(output, mode='qa', extract_answer=False):
         matches = re.findall(pattern, output)
         print(f"extract_answer_fn 里面的 matches={matches}")
         if matches:
-            print(f"extract_answer_fn 里面的 matches={matches}； 进入 if matches")
+            print(f"extract_answer_fn 里面的 matches={matches} 进入 if matches")
             extracted_text = matches[-1]  # Take the last match
         # else:  # # 其次匹配 ANSWER: 后面的内容
         #     pattern = 'ANSWER:'
@@ -72,7 +67,6 @@ def extract_answer_fn(output, mode='qa', extract_answer=False):
             for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:']:
                 if ans_pattern in output:
                     extracted_text = output.split(ans_pattern)[-1].strip('**').strip().strip('.')
-                    print(f"extract_answer_fn 里面的 extracted_text={extracted_text}； 进入 for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:']")
                     break
         if mode in ['choose']:  # # choose 模式额外处理 \text{} 和括号
             inner_pattern = r'\\text\{(.*)\}'
@@ -160,40 +154,30 @@ Did the model give an answer equivalent to the labeled answer? Please respond wi
 
 async def llm_evaluate_equivalence_batch(
     questions: List[str],
-    labeled_answers: List[str],
+    labeled_answers: List[str], 
     pred_answers: List[str],
     api_base_url: str = None,
     model_name: str = None,
-    api_key: str = None,
+    api_key: str = "empty",
     concurrent_limit: int = 50,
-    extract_answer: bool = False,
+    extract_answer: bool = False
 ) -> List[bool]:
-    """Evaluate multiple answer pairs concurrently using LLM."""
-    # 优先使用传入参数；否则从环境变量读；最后回退到 aihubmix 兼容的默认值
+    """
+    Evaluate multiple answer pairs concurrently using LLM
+    """
     if api_base_url is None:
-        api_base_url = "https://aihubmix.com/v1"
+        api_base_url = None
     if model_name is None:
-        model_name = "gpt-4o"
-    if api_key is None:
-        api_key = os.getenv("OPENAI_API_KEY")
-
-    # SOCKS5 代理配置（ socks5h 表示由代理解析域名）
-    proxy_url = "socks5h://127.0.0.1:1824"
-
-    # 用 httpx 的 AsyncClient 指定代理，传给 AsyncOpenAI
-    http_client = httpx.AsyncClient(
-        proxy=proxy_url,  # 改用 proxy 参数，直接写字符串
-        timeout=httpx.Timeout(60.0, connect=10.0),  # 可按需要调整
-    )
+        # model_name = "Qwen2.5-72B-Instruct"
+        model_name = "qwen3.5-9b"
 
     client = AsyncOpenAI(
         api_key=api_key,
         base_url=api_base_url,
-        http_client=http_client,
     )
 
     semaphore = asyncio.Semaphore(concurrent_limit)
-
+    
     tasks = [
         llm_evaluate_equivalence_single(
             client=client,
@@ -202,7 +186,7 @@ async def llm_evaluate_equivalence_batch(
             pred_answer=p,
             model_name=model_name,
             semaphore=semaphore,
-            extract_answer=extract_answer,
+            extract_answer=extract_answer
         )
         for q, l, p in zip(questions, labeled_answers, pred_answers)
     ]
@@ -212,12 +196,10 @@ async def llm_evaluate_equivalence_batch(
             result = await task
             pbar.update(1)
             return result
-
+            
         tracked_tasks = [track_progress(task) for task in tasks]
         results = await asyncio.gather(*tracked_tasks)
-
-    # 安全关闭 httpx 异步客户端
-    await http_client.aclose()
+    
     return results
 
 
@@ -253,9 +235,9 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
             em = int(normalized_pred_answer == normalized_ground_truth)
             acc = int(normalized_ground_truth in normalized_pred_answer)
 
-            prediction_tokens = normalized_pred_answer.split() # 将经过标准化处理的模型预测答案和标准答案按空格切分成单词列表。
+            prediction_tokens = normalized_pred_answer.split()
             ground_truth_tokens = normalized_ground_truth.split()
-            common = Counter(prediction_tokens) & Counter(ground_truth_tokens)  # 利用 collections.Counter 计算两个列表的交集。这里不仅看单词是否相同，还计算每个单词出现的最小次数（处理重复词的情况）。
+            common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
             num_same = sum(common.values())
             if num_same == 0:
                 continue
@@ -567,9 +549,6 @@ async def run_evaluation(filtered_data, input_list, output_list, task_type, outp
 
 if __name__ == "__main__":
     import argparse
-    import asyncio
-    import os  # 确保导入 os 模块（虽然通常文件顶部已有，但这里显式使用）
-
     parser = argparse.ArgumentParser(description="Evaluate model outputs.")
     parser.add_argument('--output_path', type=str, required=True, help='Path to the model output JSON file.')
     parser.add_argument('--task', type=str, required=True, choices=['code', 'math', 'choose', 'qa', 'llm'], help='Task type for evaluation')
@@ -594,7 +573,7 @@ if __name__ == "__main__":
     input_list = []
     output_list = []
     filtered_data = []
-
+    
     if isinstance(data, dict):
         # Convert dict to list if data is a dictionary
         for key, item in data.items():
@@ -608,32 +587,20 @@ if __name__ == "__main__":
         input_list = [item.get('Question', item.get('question')) for item in data]
         output_list = [item.get('Output', item.get('result')) for item in data]
 
-    # --- 修改开始 ---
-    # 1. 获取输出文件所在的目录
-    output_dir = os.path.dirname(output_path)
-    
-    # 2. 获取输出文件的基础文件名，避免在 run_evaluation 内部拼接出双重路径
-    metrics_filename = os.path.basename(output_metrics_path)
-    overall_metrics_filename = os.path.basename(output_metrics_overall_path)
-    
-    # 将主运行逻辑包装在异步函数中
-    async def main():
-        await run_evaluation(
-            filtered_data=filtered_data,  # Pass the properly structured data
-            input_list=input_list,
-            output_list=output_list,
-            task_type=args.task,
-            output_dir=output_dir,  # <--- 修正1：传入目录变量，而不是 output_path
-            output_metrics_path=metrics_filename,  # <--- 修正2：传入文件名
-            output_metrics_overall_path=overall_metrics_filename,  # <--- 修正2：传入文件名
-            use_llm=args.use_llm,
-            api_base_url=args.api_base_url,
-            model_name=args.model_name,
-            extract_answer=args.extract_answer,
-            domain_fields=DOMAIN_FIELDS  # Pass the domain fields to run_evaluation
-        )
-        print(f"Evaluation completed. Metrics saved to {os.path.join(output_dir, metrics_filename)}")
+    # Run evaluation with domain fields
+    run_evaluation(
+        filtered_data=filtered_data,  # Pass the properly structured data
+        input_list=input_list,
+        output_list=output_list,
+        task_type=args.task,
+        output_dir=output_path,
+        output_metrics_path=output_metrics_path,
+        output_metrics_overall_path=output_metrics_overall_path,
+        use_llm=args.use_llm,
+        api_base_url=args.api_base_url,
+        model_name=args.model_name,
+        extract_answer=args.extract_answer,
+        domain_fields=DOMAIN_FIELDS  # Pass the domain fields to run_evaluation
+    )
 
-    # 运行异步主函数
-    asyncio.run(main())
-    # --- 修改结束 ---
+    print(f"Evaluation completed. Metrics saved to {output_metrics_path}")

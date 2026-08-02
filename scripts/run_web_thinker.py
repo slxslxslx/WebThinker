@@ -29,14 +29,7 @@ from evaluate.evaluate import (
     run_evaluation, 
     extract_answer_fn
 )
-from prompts.prompts import (
-    get_deep_web_explorer_instruction, 
-    get_web_page_reader_instruction,
-    get_search_intent_instruction,
-    get_click_intent_instruction,
-    get_multiqa_search_o1_instruction, 
-    get_task_instruction_openqa, 
-)
+
 from transformers import AutoTokenizer
 
 # tokenizer = AutoTokenizer.from_pretrained("/share/project/llm/QwQ-32B")
@@ -118,6 +111,7 @@ def parse_args():
     parser.add_argument('--aux_tokenizer_path', type=str, default="/share/project/llm/Qwen2.5-32B-Instruct", help="Path to the auxiliary tokenizer")
     parser.add_argument('--api_key', type=str, default="empty", help="API key for the main model")
     parser.add_argument('--aux_api_key', type=str, default="empty", help="API key for the auxiliary model")
+    parser.add_argument('--lang', type=str, default="en", help="language")
     return parser.parse_args()
 
 # Initialize tokenizers
@@ -125,6 +119,24 @@ args = parse_args()
 tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
 aux_tokenizer = AutoTokenizer.from_pretrained(args.aux_tokenizer_path)
 
+if args.lang == 'en':
+    from prompts.prompts import (
+    get_deep_web_explorer_instruction, 
+    get_web_page_reader_instruction,
+    get_search_intent_instruction,
+    get_click_intent_instruction,
+    get_multiqa_search_o1_instruction, 
+    get_task_instruction_openqa, 
+)
+elif args.lang == 'zh':
+    from prompts.prompts import (
+    get_deep_web_explorer_instruction_zh as get_deep_web_explorer_instruction, 
+    get_web_page_reader_instruction_zh as get_web_page_reader_instruction,
+    get_search_intent_instruction_zh as get_search_intent_instruction,
+    get_click_intent_instruction_zh as get_click_intent_instruction,
+    get_multiqa_search_o1_instruction_zh as get_multiqa_search_o1_instruction,
+    get_task_instruction_openqa_zh as get_task_instruction_openqa,
+)
 
 def extract_between(text, start_marker, end_marker):  # 从一段文本中，提取指定起始标记和结束标记之间的内容。返回的是文本中“最后一次出现”的起始标记和结束标记之间的内容（而不是通常默认的第一次出现）
     """Extracts text between two markers in a string."""
