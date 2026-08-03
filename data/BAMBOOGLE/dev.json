@@ -1,7 +1,31 @@
 [
     {
-        "id": 14,
-        "Question": "Who built the fastest air-breathing manned aircraft?",
-        "answer": "Lockheed Corporation"
+        "id": 85,
+        "Question": "Who was the father of the father of psychoanalysis?",
+        "answer": "Jacob Freud"
+    },
+   {
+        "id": 91,
+        "Question": "Who is the father of the father of the hydrogen bomb?",
+        "answer": "Max Teller"
+    },
+   {
+        "id": 94,
+        "Question": "Who was the father of the founder of modern human anatomy?",
+        "answer": "Anders van Wesel"
+    },
+     {  "id": 122,
+        "Question": "Who is the father of the scientist at MIT that won the Queen Elizabeth Prize for Engineering in 2013?",
+        "answer": "Conway Berners-Lee"
+    },
+    {
+        "id": 123,
+        "Question": "Who was the mother of the emperor of Japan during World War I?",
+        "answer": "Yanagiwara Naruko"
     }
+
+
+
+
+
 ]
