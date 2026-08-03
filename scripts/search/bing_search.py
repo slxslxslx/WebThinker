@@ -558,7 +558,7 @@ async def extract_text_from_url_async(url: str, session: aiohttp.ClientSession, 
             if 'pdf' in url:
                 # Use async PDF handling
                 text = await extract_pdf_text_async(url, session)
-                print(f"是pdf，进入extract_pdf_text_async函数处理,返回 text[:10000]={text[:10000]}")
+                print(f"是pdf，进入extract_pdf_text_async函数处理,返回 text[:10000]= emmm 先打印text[:1000]={text[:1000]}")
                 return text[:10000]
 
             async with session.get(url) as response:

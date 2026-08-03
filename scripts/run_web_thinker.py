@@ -119,6 +119,7 @@ args = parse_args()
 tokenizer = AutoTokenizer.from_pretrained(args.tokenizer_path)
 aux_tokenizer = AutoTokenizer.from_pretrained(args.aux_tokenizer_path)
 
+print(f'语言  args.lang = {args.lang}')
 if args.lang == 'en':
     from prompts.prompts import (
     get_deep_web_explorer_instruction, 
@@ -498,7 +499,7 @@ async def process_single_sequence(
         min_p=args.min_p,
         stop=[END_SEARCH_QUERY],
     )
-    print(f"process_single_sequence里面的 首次生成 formatted_prompt={formatted_prompt}")
+    # print(f"process_single_sequence里面的 首次生成 formatted_prompt={formatted_prompt}")
     print(f"process_single_sequence里面的 首次生成 response={response}")
 
     # Update token count and sequence fields
