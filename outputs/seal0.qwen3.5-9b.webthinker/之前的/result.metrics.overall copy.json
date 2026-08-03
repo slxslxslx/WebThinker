@@ -1,0 +1,18 @@
+{
+    "em": 0.0,
+    "acc": 0.6666666666666666,
+    "f1": 0.0,
+    "math_equal": 0.0,
+    "num_valid_answer": "0 of 3",
+    "llm_equal": 0.0,
+    "domain_metrics": {
+        "Unknown": {
+            "total": 3,
+            "em": 0.0,
+            "acc": 0.6666666666666666,
+            "f1": 0.0,
+            "math_equal": 0.0,
+            "llm_equal": 0.0
+        }
+    }
+}
