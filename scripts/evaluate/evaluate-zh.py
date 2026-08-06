@@ -18,8 +18,10 @@ from typing import List
 from dotenv import load_dotenv
 load_dotenv()                     # 读取项目根目录（或脚本所在目录）的 .env 文件
 import httpx
-
-
+# ==============================================================================
+# 定义中文标点集合（可根据需要扩展）
+# ==============================================================================
+CHINESE_PUNCTUATION = "，。！？、；：“”‘’（）《》【】…—"
 # 从原始输出中"抽提"答案
 def extract_answer_fn(output, mode='qa', extract_answer=False):
     print(f"开始执行 extract_answer_fn，参数：output={output}")
@@ -68,11 +70,11 @@ def extract_answer_fn(output, mode='qa', extract_answer=False):
         #         print(f"extract_answer_fn 里面的 matches={matches} 进入 if pattern = ANSWER:  if pattern in output")
         #         extracted_text = output.split(pattern)[-1].strip('**').strip()
         else:
-            # 增加 "Final Answer:" 匹配
-            for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:']:
+            # 增加 "Final Answer:" 匹配（中英文）
+            for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:', '最终答案：', '答案：', '答案:']:
                 if ans_pattern in output:
                     extracted_text = output.split(ans_pattern)[-1].strip('**').strip().strip('.')
-                    print(f"extract_answer_fn 里面的 extracted_text={extracted_text}； 进入 for ans_pattern in ['Final Answer:', 'final answer:', 'FINAL ANSWER:', 'ANSWER:', 'Answer:']")
+                    print(f"extract_answer_fn 里面的 extracted_text={extracted_text}； 进入答案模式匹配")
                     break
         if mode in ['choose']:  # # choose 模式额外处理 \text{} 和括号
             inner_pattern = r'\\text\{(.*)\}'
@@ -99,28 +101,21 @@ async def llm_evaluate_equivalence_single(
     """Evaluate a single pair of answers using LLM"""
     print(f"开始执行llm_evaluate_equivalence_single ")
 
-    if extract_answer:  # 评估 Prompt。  用于评估已经被“清洗/抽取”过的、简短的预测答案。这个答案通常来自一个前置的自动化处理步骤（例如，从长输出中解析出 \boxed{}），已经是一个结构化的片段。
-        prompt = f"""You are an evaluation assistant. Please determine if the predicted answer is equivalent to the labeled answer.
 
-Question: {question}
-
-Labeled Answer: {labeled_answer}
-
-Predicted Answer: {pred_answer}
-
-Are these answers equivalent? Please respond with "Correct" if they are equivalent, or "Incorrect" if they are not equivalent. Do not include any other text.
-"""
+    if extract_answer:  # 评估 Prompt。用于评估已经被“清洗/抽取”过的、简短的预测答案。这个答案通常来自一个前置的自动化处理步骤（例如，从长输出中解析出 \boxed{}），已经是一个结构化的片段。
+            prompt = f"""你是一个评估助手。请判断预测答案是否与标准答案等价。
+    问题：{question}
+    标准答案：{labeled_answer}
+    预测答案：{pred_answer}
+    这两个答案是否等价？如果等价请回答“Correct”，如果不等价请回答“Incorrect”。不要包含任何其他文字。
+    """
     else:  # 用于评估原始的、未处理的模型输出片段。这通常是模型输出的最后几行，可能包含思考过程、解释或格式标记，相对“脏”一些。
-        prompt = f"""You are an evaluation assistant. Please determine if the model output is equivalent to the labeled answer.
-
-Question: {question}
-
-Labeled Answer: {labeled_answer}
-
-Model Output (Last few lines): {pred_answer}
-
-Did the model give an answer equivalent to the labeled answer? Please respond with "Correct" if they are equivalent, or "Incorrect" if they are not equivalent. Do not include any other text.
-"""
+            prompt = f"""你是一个评估助手。请判断模型输出是否与标准答案等价。
+    问题：{question}
+    标准答案：{labeled_answer}
+    模型输出（最后几行）：{pred_answer}
+    模型是否给出了与标准答案等价的答案？如果等价请回答“Correct”，如果不等价请回答“Incorrect”。不要包含任何其他文字。
+    """
 
     for attempt in range(retry_limit):
         try:
@@ -218,9 +213,9 @@ async def llm_evaluate_equivalence_batch(
     # 安全关闭 httpx 异步客户端
     await http_client.aclose()
     return results
-
-
-# 计算 EM/Acc/F1/Math 等指标
+# ==============================================================================
+# 计算 EM/Acc/F1/Math 等指标 - 【修改部分：针对纯中文数据集，字符级评估】
+# ==============================================================================
 def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, question=None, extract_answer=False):
     # 修改：增加 precision 和 recall 的初始化
     final_metric = {"is_valid_answer": False, "acc": 0, "em": 0, "precision": 0, "recall": 0, "f1": 0, 'math_equal': 0, 'llm_equal': 0} # 2. 初始化指标字典
@@ -233,81 +228,87 @@ def evaluate_predictions(output, labeled_answer, mode='math', use_llm=False, que
         print(f"❌❌❌evaluate.py里面 extract_answer_fn 得到的 pred_answer 无效={pred_answer} ")
         # If no answer was extracted, keep only the last 3 lines
         pred_answer_new = '\n'.join(output.replace("\n\n", "\n").strip().split('\n')[-5:])
-
+    # ===== 新增：中文标准化函数 =====
+    def _normalize_chinese(s):
+        """针对中文的标准化：去除中英文标点、去除所有空白、转小写"""
+        # 1. 去除中英文标点
+        all_punc = set(string.punctuation + CHINESE_PUNCTUATION)
+        s_no_punc = ''.join(ch for ch in s if ch not in all_punc)
+        # 2. 去除所有空白（空格、换行等）
+        s_no_ws = ''.join(s_no_punc.split())
+        # 3. 转小写（对中文无效，但对可能的英文/数字安全）
+        return s_no_ws.lower()
+    # ===== 新增：基于字符级的分词函数 =====
+    def _get_char_tokens(s):
+        """返回标准化后的字符列表"""
+        norm_s = _normalize_chinese(s)
+        return list(norm_s)  # 一个汉字一个 token
+    # ===== QA模式：字符级 F1 =====
     if mode in ['qa']:
-        def normalize_answer_qa(s):  #  # 去冠词(a/an/the) → 去标点 → 转小写 → 合并空格
-            def remove_articles(text):
-                return re.sub(r"\b(a|an|the)\b", " ", text)
-            def white_space_fix(text):
-                return " ".join(text.strip().split())
-            def remove_punc(text):
-                exclude = set(string.punctuation)
-                return "".join(ch for ch in text if ch not in exclude)
-            def lower(text):
-                return text.lower()
-            return white_space_fix(remove_articles(remove_punc(lower(s))))
-        normalized_pred_answer = normalize_answer_qa(pred_answer_new)
-
-        for answer in labeled_answer:
-            normalized_ground_truth = normalize_answer_qa(answer)
-            em = int(normalized_pred_answer == normalized_ground_truth)
-            acc = int(normalized_ground_truth in normalized_pred_answer)
-
-            prediction_tokens = normalized_pred_answer.split() # 将经过标准化处理的模型预测答案和标准答案按空格切分成单词列表。
-            ground_truth_tokens = normalized_ground_truth.split()
-            common = Counter(prediction_tokens) & Counter(ground_truth_tokens)  # 利用 collections.Counter 计算两个列表的交集。这里不仅看单词是否相同，还计算每个单词出现的最小次数（处理重复词的情况）。
+        # 获取预测答案的字符级 token
+        pred_tokens = _get_char_tokens(pred_answer_new)
+        # labeled_answer 可能是字符串，也可能是列表（多参考答案）
+        if isinstance(labeled_answer, str):
+            gold_answers = [labeled_answer]
+        else:
+            gold_answers = labeled_answer
+        for gold in gold_answers:
+            gold_tokens = _get_char_tokens(gold)
+            
+            # EM：完全匹配
+            em = int(pred_tokens == gold_tokens)
+            
+            # acc：gold 是否是 pred 的子串（字符级）
+            acc = int(''.join(gold_tokens) in ''.join(pred_tokens))
+            # 计算 precision / recall / F1（词袋型，对中文就是“字符袋”）
+            common = Counter(pred_tokens) & Counter(gold_tokens)
             num_same = sum(common.values())
+            
             if num_same == 0:
-                continue
-            precision = 1.0 * num_same / len(prediction_tokens)
-            recall = 1.0 * num_same / len(ground_truth_tokens)
-            f1 = (2 * precision * recall) / (precision + recall)
-            for k in ["em", "acc", "f1"]:
-                final_metric[k] = max(eval(k), final_metric[k])
-
+                precision = 0.0
+                recall = 0.0
+                f1 = 0.0
+            else:
+                precision = 1.0 * num_same / len(pred_tokens) if pred_tokens else 0.0
+                recall    = 1.0 * num_same / len(gold_tokens) if gold_tokens else 0.0
+                f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
+            for k in ["em", "acc", "f1"]:  # 要是想统计，你就用for k in ["em", "acc", "precision", "recall", "f1"]:  到那时我们是task math 已经在math里面加过了
+                final_metric[k] = max(final_metric[k], eval(k))
+            # 注意：qa 模式暂不覆盖 precision/recall，只保留 em/acc/f1（与原行为对齐）
+    # ===== Math / Choose 模式：同样改成字符级 =====
     elif mode in ['math', 'choose']:
-        def normalize_answer(text):  # # 仅小写+合并空格
-            text = text.lower()
-            text = " ".join(text.strip().split())
-            return text
-        normalized_pred_answer = normalize_answer(pred_answer_new)
-        normalized_ground_truth = normalize_answer(labeled_answer)
-
-        em = int(normalized_pred_answer == normalized_ground_truth)
-        acc = int(normalized_ground_truth in normalized_pred_answer)
-    
-        prediction_tokens = normalized_pred_answer.split() # split() 方法默认以空白符（空格、换行等） 为分隔符，将字符串切成单词列表。这是英文（及拉丁语系） 的典型处理方式，因为英文单词之间有天然的空格。
-        ground_truth_tokens = normalized_ground_truth.split()
-        common = Counter(prediction_tokens) & Counter(ground_truth_tokens)
+        # 统一使用字符级分词
+        pred_tokens = _get_char_tokens(pred_answer_new)
+        gold_tokens = _get_char_tokens(labeled_answer)
+        # EM / acc（字符级）
+        em = int(pred_tokens == gold_tokens)
+        acc = int(''.join(gold_tokens) in ''.join(pred_tokens))
+        # precision / recall / F1
+        common = Counter(pred_tokens) & Counter(gold_tokens)
         num_same = sum(common.values())
         if num_same == 0:
             f1 = 0
             precision = 0
             recall = 0
         else:
-            precision = 1.0 * num_same / len(prediction_tokens) if len(prediction_tokens) > 0 else 0
-            recall = 1.0 * num_same / len(ground_truth_tokens) if len(ground_truth_tokens) > 0 else 0
+            precision = 1.0 * num_same / len(pred_tokens) if pred_tokens else 0
+            recall    = 1.0 * num_same / len(gold_tokens) if gold_tokens else 0
             if (precision + recall) == 0:
                 f1 = 0
             else:
                 f1 = (2 * precision * recall) / (precision + recall)
-
         final_metric["em"] = em
         final_metric["acc"] = acc
-        # 修改：增加 precision 和 recall 的赋值
         final_metric["precision"] = precision
         final_metric["recall"] = recall
         final_metric["f1"] = f1
-
-        final_metric["math_equal"] = is_equiv(normalized_pred_answer, normalized_ground_truth)
+        # math_equal 仍使用原有的数学等价性判断，但传入标准化后的字符串
+        final_metric["math_equal"] = is_equiv(''.join(pred_tokens), ''.join(gold_tokens))
         
         # Add LLM-based evaluation if requested
         if use_llm and question is not None:
             final_metric["llm_equal"] = 0  # Will be updated in batch later
-
     return final_metric, pred_answer
-
-
 # 主流程：遍历数据、调用上述函数
 # def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir, output_metrics_path, output_metrics_overall_path, use_llm=False, extract_answer=False, domain_fields=None, api_base_url=None, model_name=None):
 async def run_evaluation(filtered_data, input_list, output_list, task_type, output_dir, output_metrics_path, output_metrics_overall_path, use_llm=True, extract_answer=True, domain_fields=None, api_base_url=None, model_name=None):
@@ -660,4 +661,3 @@ if __name__ == "__main__":
 
     # 运行异步主函数
     asyncio.run(main())
-    # --- 修改结束 ---
