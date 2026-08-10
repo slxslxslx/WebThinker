@@ -5,3 +5,6 @@ nltk_data/
 *.pyo
 *.pyd
 __pycache__/
+WebThinker/outputs/XbenchDS.qwen3.5-9b.webthinker/dev.8.10,11:14.92-中文.json
+WebThinker/outputs/XbenchDS.qwen3.5-9b.webthinker/dev.8.10,15:34.93-英文.json
+WebThinker/outputs/XbenchDS.qwen3.5-9b.webthinker/dev.8.10,13:9.96-英文但是ssh没连上，爬虫报错，所以重新运行了下面的.json
